@@ -1,9 +1,9 @@
-# \<Project Name\> Scrum Team
+# Project 5 Scrum Team
 ## Product Owner
-\<Team Member Name\>
+Chris Azuaje
 ## Scrum Master
-\<Team Member Name\>
+Michael Gain
 ## Developers
-- \<Team Member Name\>
-- \<Team Member Name\>
-- \<Team Member Name\>
+- Abhinay Veerlapally
+- Abhiram Jarugula 
+- Gagan Gottipati
