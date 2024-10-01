@@ -39,12 +39,14 @@ class UserList extends React.Component {
                 <ListItemAvatar>
                   <Avatar
                     alt='#'
-                    src={window.models.photoOfUserModel(user._id[0].file_name)}
+                    src={window.models
+                      .photoOfUserModel(user._id[0].file_name)
+                      .toString()}
                   />
                 </ListItemAvatar>
                 <ListItemText
                   primary={user.first_name + ' ' + user.last_name}
-                  secondary={user.description}
+                  key={user._id}
                 />
               </ListItem>
               <Divider />
