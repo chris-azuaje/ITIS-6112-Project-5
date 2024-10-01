@@ -9,6 +9,8 @@ import {
   Typography,
 } from '@mui/material';
 
+import {Link} from 'react-router-dom';
+
 // import ImageIcon from '@mui/icons-material/Image';
 
 import './userList.css';
@@ -34,23 +36,21 @@ class UserList extends React.Component {
         </Typography>
         <List component='nav'>
           {users.map((user) => (
-            <>
+            <div key={user._id}>
               <ListItem>
                 <ListItemAvatar>
                   <Avatar
-                    alt='#'
-                    src={window.models
-                      .photoOfUserModel(user._id[0].file_name)
-                      .toString()}
+                    alt={`${user.first_name}`}
+                    src='#'
                   />
                 </ListItemAvatar>
                 <ListItemText
-                  primary={user.first_name + ' ' + user.last_name}
+                  primary={<Link to={`/user/${user._id}`}>{user.first_name} {user.last_name}</Link>}
                   key={user._id}
                 />
               </ListItem>
               <Divider />
-            </>
+            </div>
           ))}
         </List>
         <Typography variant='body1'>
