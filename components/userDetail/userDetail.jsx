@@ -1,12 +1,17 @@
 import React from 'react';
 import { Typography, Button } from '@mui/material'; // Import Button from Material-UI
 import './userDetail.css'; // Change this if you create a specific CSS for user details
-import { Link } from "react-router-dom";
-import { models } from '../../modelData/photoApp';
+import fetchModel from '../../lib/fetchModelData';
 
 class UserDetail extends React.Component {
     constructor(props) {
         super(props);
+
+		this.state = {
+			user: {}
+		};
+
+		this.getUserDetails();
     }
 
     handleViewPhotosClick = () => {
@@ -16,19 +21,31 @@ class UserDetail extends React.Component {
         history.push(`/photos/${userId}`);
     };
 
+	getUserDetails () {
+		fetchModel(`/user/${this.props.match.params.userId}`)
+		.then(
+			(data) => { this.setState( {user: data.data} ); },
+			(err) => { console.log(err); }
+		);
+	  }
+
     render() {
-        const user = models.userModel(this.props.match.params.userId);
         return (
+			(this.state.user.length === 0) ? 
+			<p>Loading user details</p>
+			:
+			(
             <>
                 <Typography variant='h2'>User Details</Typography>
-                <Typography variant='body1'>Name: {`${user.first_name} ${user.last_name}`}</Typography>
-                <Typography variant='body1'>Location: {user.location}</Typography>
-                <Typography variant='body1'>Description: {user.description}</Typography>
-                <Typography variant='body1'>Occupation: {user.occupation}</Typography>
+                <Typography variant='body1'>Name: {`${this.state.user.first_name} ${this.state.user.last_name}`}</Typography>
+                <Typography variant='body1'>Location: {this.state.user.location}</Typography>
+                <Typography variant='body1'>Description: {this.state.user.description}</Typography>
+                <Typography variant='body1'>Occupation: {this.state.user.occupation}</Typography>
                 <Button variant="contained" color="primary" onClick={this.handleViewPhotosClick}>
                     View Photos
                 </Button>
             </>
+			)
         );
     }
 }
