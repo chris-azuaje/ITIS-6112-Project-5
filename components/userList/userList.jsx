@@ -64,7 +64,7 @@ class UserList extends React.Component {
 					/>
 					</ListItemAvatar>
 					<ListItemText
-					primary={<Link to={`/user/${user._id}`}>{user.first_name} {user.last_name}</Link>}
+					primary={<Link to={`/users/${user._id}`}>{user.first_name} {user.last_name}</Link>}
 					key={user._id}
 					/>
 				</ListItem>
