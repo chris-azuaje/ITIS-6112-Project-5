@@ -33,13 +33,13 @@ function TopBar(props) {
         <Typography variant='h5' color='inherit'>
           G3
         </Typography>
-        {/* <Typography variant='h5' color='inherit'>
+        <Typography variant='h5' color='inherit'>
           {userId
             ? `Details of ${window.models.userModel(userId).first_name}`
             : photo
             ? `Photos of ${window.models.userModel(photo).first_name}`
             : ''}
-        </Typography> */}
+        </Typography>
         <Typography variant='body2' color='inherit'>
           Version: {version}
         </Typography>
