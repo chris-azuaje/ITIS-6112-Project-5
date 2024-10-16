@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography } from '@mui/material';
 import { withRouter } from 'react-router-dom';
-import FetchModel from '../../lib/fetchModelData';
+// import FetchModel from '../../lib/fetchModelData';
+import axios from 'axios';
 
 function TopBar(props) {
   const [version, setVersion] = useState('');
 
+  // useEffect(() => {
+  //   FetchModel('http://localhost:3000/test/info')
+  //     .then((response) => {
+  //       const versionNumber = response.data.load_date_time;
+  //       setVersion(versionNumber);
+  //     })
+  //     .catch((error) => {
+  //       console.error('Error fetching version number:', error);
+  //     });
+  // }, []);
+
   useEffect(() => {
-    // Fetch the version number from the server
-    FetchModel('http://localhost:3000/test/info')
+    axios
+      .get('http://localhost:3000/test/info')
       .then((response) => {
         const versionNumber = response.data.load_date_time;
         setVersion(versionNumber);
