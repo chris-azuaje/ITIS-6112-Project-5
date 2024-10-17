@@ -22,21 +22,11 @@ class UserDetail extends React.Component {
     history.push(`/photos/${userId}`);
   };
 
-  //   getUserDetails() {
-  //     fetchModel(`/user/${this.props.match.params.userId}`).then(
-  //       (data) => {
-  //         this.setState({ user: data.data });
-  //       },
-  //       (err) => {
-  //         console.log(err);
-  //       }
-  //     );
-  //   }
-
   getUserDetails() {
     axios.get(`/user/${this.props.match.params.userId}`).then(
       (data) => {
         this.setState({ user: data.data });
+		
       },
       (err) => {
         console.log(err);
@@ -45,32 +35,35 @@ class UserDetail extends React.Component {
   }
 
   render() {
-    return this.state.user.length === 0 ? (
-      <p>Loading user details</p>
-    ) : (
-      <>
-        <Typography variant='h2'>User Details</Typography>
-        <Typography variant='body1'>
-          Name: {`${this.state.user.first_name} ${this.state.user.last_name}`}
-        </Typography>
-        <Typography variant='body1'>
-          Location: {this.state.user.location}
-        </Typography>
-        <Typography variant='body1'>
-          Description: {this.state.user.description}
-        </Typography>
-        <Typography variant='body1'>
-          Occupation: {this.state.user.occupation}
-        </Typography>
-        <Button
-          variant='contained'
-          color='primary'
-          onClick={this.handleViewPhotosClick}
-        >
-          View Photos
-        </Button>
-      </>
-    );
+    return (
+		(this.state.user.length === 0) ?
+		<p>Loading user details</p>
+		:
+		(
+			<>
+				<Typography variant='h2'>User Details</Typography>
+				<Typography variant='body1'>
+					Name: {`${this.state.user.first_name} ${this.state.user.last_name}`}
+				</Typography>
+				<Typography variant='body1'>
+					Location: {this.state.user.location}
+				</Typography>
+				<Typography variant='body1'>
+					Description: {this.state.user.description}
+				</Typography>
+				<Typography variant='body1'>
+					Occupation: {this.state.user.occupation}
+				</Typography>
+				<Button
+					variant='contained'
+					color='primary'
+					onClick={this.handleViewPhotosClick}
+				>
+					View Photos
+				</Button>
+			</>
+		)
+	);
   }
 }
 

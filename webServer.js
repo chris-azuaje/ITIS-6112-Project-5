@@ -46,7 +46,7 @@ const SchemaInfo = require("./schema/schemaInfo.js");
 
 // XXX - Your submission should work without this line. Comment out or delete
 // this line for tests and before submission!
-const models = require("./modelData/photoApp.js").models;
+//const models = require("./modelData/photoApp.js").models;
 mongoose.set("strictQuery", false);
 mongoose.connect("mongodb://127.0.0.1/project6", {
   useNewUrlParser: true,
@@ -143,37 +143,84 @@ app.get("/test/:p1", function (request, response) {
  * URL /user/list - Returns all the User objects.
  */
 app.get("/user/list", function (request, response) {
-  response.status(200).send(models.userListModel());
+	User.find({}, '_id first_name last_name').lean().exec()
+	.then( result => {
+		console.log(JSON.stringify(result));
+		response.status(200).send(JSON.stringify(result));
+	})
+	.catch(err => {
+		response.status(500).send(JSON.stringify(err));
+	});
+
 });
 
 /**
  * URL /user/:id - Returns the information for User (id).
  */
 app.get("/user/:id", function (request, response) {
-  const id = request.params.id;
-  const user = models.userModel(id);
-  if (user === null) {
-    console.log("User with _id:" + id + " not found.");
-    response.status(400).send("Not found");
-    return;
-  }
-  response.status(200).send(user);
+	const param = request.params.id;
+
+	User.findById(param, 'first_name last_name location description occupation').lean().exec()
+	.then( result => {
+		if (result === null) response.status(400).end(JSON.stringify(result));
+		else response.status(200).end(JSON.stringify(result));
+
+	})
+	.catch(err => {
+		response.status(500).send(JSON.stringify(err));
+	});
+
 });
 
 /**
  * URL /photosOfUser/:id - Returns the Photos for User (id).
  */
 app.get("/photosOfUser/:id", function (request, response) {
-  const id = request.params.id;
-  const photos = models.photoOfUserModel(id);
-  if (photos.length === 0) {
-    console.log("Photos for user with _id:" + id + " not found.");
-    response.status(400).send("Not found");
-    return;
-  }
-  response.status(200).send(photos);
-});
+	const param = request.params.id;
+  
+	Photo.find({ user_id: param }, 'file_name date_time user_id comments')
+	  .populate({
+		path: 'comments.user_id',
+		select: 'first_name last_name _id'
+	  })
+	  .lean()
+	  .exec()
+	  .then(result => {
+		if (result.length === 0) {
+		  response.status(400).end();
+		}
+  
+		// Copies values from 'user_id' into a new 'user' property. 
+		// This is because the user_id prop is used as a joiner and contains 
+		// user data assocaited with user_id
+		const transformedResult = result.map(photo => {
+		  const transformedComments = photo.comments.map(comment => ({
+			...comment,
+			user: comment.user_id,
+		  }));
+  
+		  return {
+			...photo,
+			comments: transformedComments,
+		  };
+		});
+  
+		// Remove user_id from comments
+		transformedResult.forEach(photo => {
+		  photo.comments.forEach(comment => delete comment.user_id);
+		});
+  
+		response.status(200).json(transformedResult);
+	  })
+	  .catch(err => {
+		console.error(err);
+		response.status(500).send(JSON.stringify(err));
+	  });
+  });
 
+
+
+  
 const server = app.listen(3000, function () {
   const port = server.address().port;
   console.log(
