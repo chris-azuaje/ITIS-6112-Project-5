@@ -173,9 +173,14 @@ app.get("/user/:id", function (request, response) {
  * URL /photosOfUser/:id - Returns the Photos for User (id).
  */
 app.get("/photosOfUser/:id", function (request, response) {
-  	const param = request.params.id;
+	const param = request.params.id;
 	
-	Photo.find({user_id: param}).lean().exec()
+	Photo.find({user_id: param}).populate({
+		path:'comments.user_id',
+		select: 'first_name last_name _id'
+	})
+	.lean()
+	.exec()
 	.then( result => {
 		console.log("Success?");
 		console.log(result);
@@ -184,6 +189,18 @@ app.get("/photosOfUser/:id", function (request, response) {
 	.catch(err => {
 		response.status(500).send(JSON.stringify(err));
 	});
+	
+	// const param = request.params.id;
+	
+	// Photo.find({user_id: param}).populate('comments.user_id').lean().exec()
+	// .then( result => {
+	// 	console.log("Success?");
+	// 	console.log(result);
+	// 	response.end(JSON.stringify(result));
+	// })
+	// .catch(err => {
+	// 	response.status(500).send(JSON.stringify(err));
+	// });
 });
 
 const server = app.listen(3000, function () {

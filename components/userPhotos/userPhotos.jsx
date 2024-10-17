@@ -13,28 +13,13 @@ function UserPhotos() {
   const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
   const history = useHistory();
 
-  //   useEffect(() => {
-  //     FetchModel(`/photosOfUser/${userId}`)
-  //       .then((response) => {
-  //         const userPhotos = response.data;
-  //         setPhotos(userPhotos);
-
-  //         if (photoIndex) {
-  //           setAdvancedFeaturesEnabled(true);
-  //           setCurrentPhotoIndex(parseInt(photoIndex));
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error('Error fetching user photos:', error);
-  //       });
-  //   }, [userId, photoIndex]);
-
 useEffect(() => {
     axios
       .get(`/photosOfUser/${userId}`)
       .then((response) => {
         const userPhotos = response.data;
-		console.log(response);
+		// console.log(response);
+		// console.log(userPhotos[0].comments[0].user_id._id);
         setPhotos(userPhotos);
 
         if (photoIndex) {
@@ -112,10 +97,10 @@ useEffect(() => {
                 <li key={comment._id} className='comment'>
                   <p>Comment Date/Time: {comment.date_time}</p>
                   <p>
-                    Comment by:{' '}
-                    <Link to={`/users/${comment.user_id}`}>
-                      {`${comment.user_id.first_name} ${comment.user_id.last_name}`}
-                    </Link>
+                    Comment by:{'  '}
+					<Link to={`/users/${comment.user_id._id}`}>
+                        {`${comment.user_id.first_name} ${comment.user_id.last_name}`}
+					</Link>
                   </p>
                   <p>Comment: {comment.comment}</p>
                 </li>
@@ -143,7 +128,7 @@ useEffect(() => {
                     <p>Comment Date/Time: {comment.date_time}</p>
                     <p>
                       Comment by:{' '}
-                      <Link to={`/users/${comment.user_id}`}>
+                      <Link to={`/users/${comment.user_id._id}`}>
                         {`${comment.user_id.first_name} ${comment.user_id.last_name}`}
                       </Link>
                     </p>

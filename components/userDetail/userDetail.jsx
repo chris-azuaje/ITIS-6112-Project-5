@@ -22,23 +22,11 @@ class UserDetail extends React.Component {
     history.push(`/photos/${userId}`);
   };
 
-  //   getUserDetails() {
-  //     fetchModel(`/user/${this.props.match.params.userId}`).then(
-  //       (data) => {
-  //         this.setState({ user: data.data });
-  //       },
-  //       (err) => {
-  //         console.log(err);
-  //       }
-  //     );
-  //   }
-
   getUserDetails() {
     axios.get(`/user/${this.props.match.params.userId}`).then(
       (data) => {
         this.setState({ user: data.data });
-		this.props.match.params.first_name = this.state.user.first_name;
-		this.props.match.params.last_name = this.state.user.last_name;
+		
       },
       (err) => {
         console.log(err);
