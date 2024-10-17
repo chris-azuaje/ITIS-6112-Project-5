@@ -22,7 +22,7 @@ function TopBar(props) {
     axios
       .get('/test/info')
       .then((response) => {
-        const versionNumber = response.data.load_date_time;
+        const versionNumber = response.data.version;
         setVersion(versionNumber);
       })
       .catch((error) => {
@@ -39,6 +39,7 @@ function TopBar(props) {
     ? pathname.split('/photos/')[1]
     : null;
 
+	console.log(props);
   return (
     <AppBar className='topbar-appBar' position='absolute'>
       <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -47,9 +48,9 @@ function TopBar(props) {
         </Typography>
         <Typography variant='h5' color='inherit'>
           {userId
-            ? `Details of ${window.models.userModel(userId).first_name}`
+            ? `Details of ${props.match.params.first_name}`
             : photo
-            ? `Photos of ${window.models.userModel(photo).first_name}`
+            ? `Photos of ${props.match.params.first_name}`
             : ''}
         </Typography>
         <Typography variant='body2' color='inherit'>

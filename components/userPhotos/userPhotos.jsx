@@ -34,6 +34,7 @@ useEffect(() => {
       .get(`/photosOfUser/${userId}`)
       .then((response) => {
         const userPhotos = response.data;
+		console.log(response);
         setPhotos(userPhotos);
 
         if (photoIndex) {
@@ -67,7 +68,11 @@ useEffect(() => {
   };
 
   return (
-    <div className='user-photos-container'>
+	(photos.length === 0) ?
+	<p>Loading...</p>
+	:
+    (
+	<div className='user-photos-container'>
       <Button variant='contained' color='primary' onClick={handleGoBack}>
         Go back to user details
       </Button>
@@ -108,8 +113,8 @@ useEffect(() => {
                   <p>Comment Date/Time: {comment.date_time}</p>
                   <p>
                     Comment by:{' '}
-                    <Link to={`/users/${comment.user._id}`}>
-                      {`${comment.user.first_name} ${comment.user.last_name}`}
+                    <Link to={`/users/${comment.user_id}`}>
+                      {`${comment.user_id.first_name} ${comment.user_id.last_name}`}
                     </Link>
                   </p>
                   <p>Comment: {comment.comment}</p>
@@ -138,8 +143,8 @@ useEffect(() => {
                     <p>Comment Date/Time: {comment.date_time}</p>
                     <p>
                       Comment by:{' '}
-                      <Link to={`/users/${comment.user._id}`}>
-                        {`${comment.user.first_name} ${comment.user.last_name}`}
+                      <Link to={`/users/${comment.user_id}`}>
+                        {`${comment.user_id.first_name} ${comment.user_id.last_name}`}
                       </Link>
                     </p>
                     <p>Comment: {comment.comment}</p>
@@ -153,8 +158,9 @@ useEffect(() => {
             )}
           </div>
         ))
-      )}
-    </div>
+      	)}
+	</div>
+	)
   );
 }
 
