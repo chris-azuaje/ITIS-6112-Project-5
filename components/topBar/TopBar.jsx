@@ -20,7 +20,7 @@ function TopBar(props) {
 
   useEffect(() => {
     axios
-      .get('http://localhost:3000/test/info')
+      .get('/test/info')
       .then((response) => {
         const versionNumber = response.data.load_date_time;
         setVersion(versionNumber);

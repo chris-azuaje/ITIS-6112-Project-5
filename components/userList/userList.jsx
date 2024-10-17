@@ -54,14 +54,14 @@ class UserList extends React.Component {
 
   render() {
     return (
-		(this.state.users.length === 0) ?
-		<p>Loading Users</p>
-		:
-		(
-		<div>
-			<List component='nav'>
+	(this.state.users.length === 0) ?
+	<p>Loading Users</p>
+	:
+	(
+	<div>
+		<List component='nav'>
 			{this.state.users.map((user) => (
-				<div key={user._id}>
+			<div key={user._id}>
 				<ListItem>
 					<ListItemAvatar>
 					<Avatar
@@ -70,20 +70,20 @@ class UserList extends React.Component {
 					/>
 					</ListItemAvatar>
 					<ListItemText
-              primary={(
-                <Link to={`/users/${user._id}`}>
-                  {user.first_name} {user.last_name}
-                </Link>
-              )}
-              key={user._id}
-            />
-          </ListItem>
-          <Divider />
-        </div>
-        ))}
-        </List>
-      </div>
-    );
+						primary={(
+							<Link to={`/users/${user._id}`}>
+								{user.first_name} {user.last_name}
+							</Link>
+						)}
+						key={user._id} 
+					/>
+				</ListItem>
+				<Divider />
+			</div>
+			))}
+		</List>
+	</div>
+	));
   }
 }
 

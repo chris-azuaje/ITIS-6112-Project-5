@@ -8,7 +8,7 @@ import axios from 'axios';
 function UserPhotos() {
   const { userId, photoIndex } = useParams();
   const [photos, setPhotos] = useState([]);
-  const [advancedFeaturesEnabled, setAdvancedFeaturesEnabled] = useState(false);
+  const [, setAdvancedFeaturesEnabled] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
   const history = useHistory();
@@ -45,12 +45,6 @@ useEffect(() => {
         console.error('Error fetching user photos:', error);
       });
   }, [userId, photoIndex]);
-
-  const navigateToPhoto = (index) => {
-    if (index >= 0 && index < photos.length) {
-      setCurrentPhotoIndex(index);
-    }
-  };
 
   const handleCheckboxChange = () => {
     setShowAdvancedFeatures(!showAdvancedFeatures);
