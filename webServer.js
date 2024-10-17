@@ -160,13 +160,16 @@ app.get("/user/list", function (request, response) {
 app.get("/user/:id", function (request, response) {
 	const param = request.params.id;
 
-	User.findById(param).lean().exec()
+	User.findById(param, 'first_name last_name location description occupation').lean().exec()
 	.then( result => {
-		response.end(JSON.stringify(result));
+		if (result === null) response.status(400).end(JSON.stringify(result));
+		else response.status(200).end(JSON.stringify(result));
+
 	})
 	.catch(err => {
 		response.status(500).send(JSON.stringify(err));
 	});
+
 });
 
 /**
@@ -174,35 +177,50 @@ app.get("/user/:id", function (request, response) {
  */
 app.get("/photosOfUser/:id", function (request, response) {
 	const param = request.params.id;
-	
-	Photo.find({user_id: param}).populate({
-		path:'comments.user_id',
+  
+	Photo.find({ user_id: param }, 'file_name date_time user_id comments')
+	  .populate({
+		path: 'comments.user_id',
 		select: 'first_name last_name _id'
-	})
-	.lean()
-	.exec()
-	.then( result => {
-		console.log("Success?");
-		console.log(result);
-		response.end(JSON.stringify(result));
-	})
-	.catch(err => {
+	  })
+	  .lean()
+	  .exec()
+	  .then(result => {
+		if (result.length === 0) {
+		  response.status(400).end();
+		}
+  
+		// Copies values from 'user_id' into a new 'user' property. 
+		// This is because the user_id prop is used as a joiner and contains 
+		// user data assocaited with user_id
+		const transformedResult = result.map(photo => {
+		  const transformedComments = photo.comments.map(comment => ({
+			...comment,
+			user: comment.user_id,
+		  }));
+  
+		  return {
+			...photo,
+			comments: transformedComments,
+		  };
+		});
+  
+		// Remove user_id from comments
+		transformedResult.forEach(photo => {
+		  photo.comments.forEach(comment => delete comment.user_id);
+		});
+  
+		response.status(200).json(transformedResult);
+	  })
+	  .catch(err => {
+		console.error(err);
 		response.status(500).send(JSON.stringify(err));
-	});
-	
-	// const param = request.params.id;
-	
-	// Photo.find({user_id: param}).populate('comments.user_id').lean().exec()
-	// .then( result => {
-	// 	console.log("Success?");
-	// 	console.log(result);
-	// 	response.end(JSON.stringify(result));
-	// })
-	// .catch(err => {
-	// 	response.status(500).send(JSON.stringify(err));
-	// });
-});
+	  });
+  });
 
+
+
+  
 const server = app.listen(3000, function () {
   const port = server.address().port;
   console.log(

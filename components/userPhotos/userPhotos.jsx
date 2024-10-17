@@ -18,8 +18,6 @@ useEffect(() => {
       .get(`/photosOfUser/${userId}`)
       .then((response) => {
         const userPhotos = response.data;
-		// console.log(response);
-		// console.log(userPhotos[0].comments[0].user_id._id);
         setPhotos(userPhotos);
 
         if (photoIndex) {
@@ -98,8 +96,8 @@ useEffect(() => {
                   <p>Comment Date/Time: {comment.date_time}</p>
                   <p>
                     Comment by:{'  '}
-					<Link to={`/users/${comment.user_id._id}`}>
-                        {`${comment.user_id.first_name} ${comment.user_id.last_name}`}
+					<Link to={`/users/${comment.user._id}`}>
+                        {`${comment.user.first_name} ${comment.user.last_name}`}
 					</Link>
                   </p>
                   <p>Comment: {comment.comment}</p>
@@ -128,8 +126,8 @@ useEffect(() => {
                     <p>Comment Date/Time: {comment.date_time}</p>
                     <p>
                       Comment by:{' '}
-                      <Link to={`/users/${comment.user_id._id}`}>
-                        {`${comment.user_id.first_name} ${comment.user_id.last_name}`}
+                      <Link to={`/users/${comment.user._id}`}>
+                        {`${comment.user.first_name} ${comment.user.last_name}`}
                       </Link>
                     </p>
                     <p>Comment: {comment.comment}</p>
