@@ -28,15 +28,36 @@ function UserPhotos() {
             });
     }, [userId, photoIndex]);
 
+<<<<<<< Updated upstream
     const navigateToPhoto = (index) => {
         if (index >= 0 && index < photos.length) {
             setCurrentPhotoIndex(index);
+=======
+  useEffect(() => {
+    axios
+      .get(`/photosOfUser/${userId}`)
+      .then((response) => {
+        const userPhotos = response.data;
+        setPhotos(userPhotos);
+
+        if (photoIndex) {
+          setAdvancedFeaturesEnabled(true);
+          setCurrentPhotoIndex(parseInt(photoIndex, 10));
+>>>>>>> Stashed changes
         }
     };
 
+<<<<<<< Updated upstream
     const handleCheckboxChange = () => {
         setShowAdvancedFeatures(!showAdvancedFeatures);
     };
+=======
+  // const navigateToPhoto = (index) => {
+  //   if (index >= 0 && index < photos.length) {
+  //     setCurrentPhotoIndex(index);
+  //   }
+  // };
+>>>>>>> Stashed changes
 
     const handleGoBack = () => {
         history.push(`/users/${userId}`);

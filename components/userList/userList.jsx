@@ -6,7 +6,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  Typography,
+  // Typography,
 } from '@mui/material';
 
 import {Link} from 'react-router-dom';
@@ -41,6 +41,7 @@ class UserList extends React.Component {
   }
 
   render() {
+<<<<<<< Updated upstream
     return (
 		(this.state.users.length === 0) ?
 		<p>Loading Users</p>
@@ -68,6 +69,33 @@ class UserList extends React.Component {
 			</List>
 		</div>
 		)
+=======
+    return this.state.users.length === 0 ? (
+      <p>Loading Users</p>
+    ) : (
+      <div>
+        <List component='nav'>
+          {this.state.users.map((user) => (
+            <div key={user._id}>
+              <ListItem>
+                <ListItemAvatar>
+                  <Avatar alt={`${user.first_name}`} src='#' />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={(
+                    <Link to={`/users/${user._id}`}>
+                      {user.first_name} {user.last_name}
+                    </Link>
+                  )}
+                  key={user._id}
+                />
+              </ListItem>
+              <Divider />
+            </div>
+          ))}
+        </List>
+      </div>
+>>>>>>> Stashed changes
     );
   }
 }
