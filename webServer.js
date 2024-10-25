@@ -39,6 +39,10 @@ const async = require("async");
 const express = require("express");
 const app = express();
 
+const session = require("express-session");
+const bodyParser = require("body-parser");
+const multer = require("multer");
+
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require("./schema/user.js");
 const Photo = require("./schema/photo.js");
@@ -56,6 +60,10 @@ mongoose.connect("mongodb://127.0.0.1/project6", {
 // We have the express static module
 // (http://expressjs.com/en/starter/static-files.html) do all the work for us.
 app.use(express.static(__dirname));
+
+app.use(session({secret: "secretKey", resave: false, saveUninitialized: false}));
+app.use(bodyParser.json());
+
 
 app.get("/", function (request, response) {
   response.send("Simple web server of files from " + __dirname);
