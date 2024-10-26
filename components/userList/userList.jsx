@@ -6,15 +6,12 @@ import {
   List,
   ListItem,
   ListItemText,
+  Typography,
   // Typography,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import './userList.css';
 import axios from 'axios';
-// import ImageIcon from '@mui/icons-material/Image';
-// import fetchModel from '../../lib/fetchModelData';
-
-//const users = window.models.userListModel();
 
 /**
  * Define UserList, a React component of project #5
@@ -25,21 +22,11 @@ class UserList extends React.Component {
 
     this.state = {
       users: [],
+	  mustLogin: false,
     };
 
     this.getUsers();
   }
-
-  //   getUsers() {
-  //     fetchModel(`/user/list`).then(
-  //       (data) => {
-  //         this.setState({ users: data.data });
-  //       },
-  //       (err) => {
-  //         console.log(err);
-  //       }
-  //     );
-  //   }
 
   getUsers() {
     axios.get(`/user/list`).then(
@@ -48,12 +35,16 @@ class UserList extends React.Component {
       },
       (err) => {
         console.log(`Status Code UL: ${err.response.status}`);
+		this.setState({mustLogin: true});
       }
     );
   }
 
   render() {
     return (
+	(this.state.mustLogin) ?
+	<Typography variant="h5">Please Login to View Users</Typography>
+	:
 	(this.state.users.length === 0) ?
 	<p>Loading Users</p>
 	:

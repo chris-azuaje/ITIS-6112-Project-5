@@ -12,7 +12,7 @@ export default function LogoutButton(props) {
 				props.SetUser({}, false);
 			},
 			(err) => {
-				console.log(err.response);
+				console.log(`Error ${err.response.status}: Must login`);
 			}
 		);
 	};

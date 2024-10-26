@@ -1,11 +1,13 @@
-import React from 'react';
+import React, {useState} from 'react';
 
-import { Typography, TextField, Box, Button, Grid} from '@mui/material';
+import { Typography, TextField, Box, Button, Grid, Alert} from '@mui/material';
 
 import './loginRegister.css';
 import axios from 'axios';
 
 function LoginModal(props) {
+	let [invalidLogin, setInvalidLogin] = useState(false);
+
 
 	const LoginRequest = (event) => {
 		event.preventDefault();
@@ -20,57 +22,65 @@ function LoginModal(props) {
 				props.SetUser(res.data, true);
 			},
 			(err) => {
-				// console.log(err.response.status);
+				console.log(err.response.status);
+				setInvalidLogin(true);
 			}
 		);
 	};
 
 	return (
-		<Box sx={{
-			display: 'flex',
-			alignItems: 'center',
-			justifyContent: 'center',
-		}}>
-			<Box component="form" onSubmit={LoginRequest}>
-				<Typography component="h1" variant="h5">Sign In</Typography>
-				
-				<TextField
-					margin="normal"
-					required
-					autoFocus
-					fullWidth
-					label="Login Name"
-					name="login_name"
-					id="login_name"
-				/>
-				
-				<TextField
-					margin="normal"
-					required
-					fullWidth
-					label="Password"
-					name="password"
-					type="password"
-					id="password"
-				/>
-				<Button
-					type="submit"
-					fullWidth
-					variant="contained"
-					sx={{mt:3, mb: 2}}
-				>
-					Login
-				</Button>
-				<Grid container>
-					<Grid item>
-						<Button onClick={props.SwitchModes} variant="contained" color="grey">
-							{"Don't have an account? Sign Up"}
-						</Button>
+		<>
+			{
+				(invalidLogin) ?
+				<Alert severity='error'>Incorrect Login Name or Password. Try again.</Alert>
+				:
+				''
+			}
+			<Box sx={{
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+			}}>
+				<Box component="form" onSubmit={LoginRequest}>
+					<Typography component="h1" variant="h5">Sign In</Typography>
+					
+					<TextField
+						margin="normal"
+						required
+						autoFocus
+						fullWidth
+						label="Login Name"
+						name="login_name"
+						id="login_name"
+						/>
+					
+					<TextField
+						margin="normal"
+						required
+						fullWidth
+						label="Password"
+						name="password"
+						type="password"
+						id="password"
+						/>
+					<Button
+						type="submit"
+						fullWidth
+						variant="contained"
+						sx={{mt:3, mb: 2}}
+						>
+						Login
+					</Button>
+					<Grid container>
+						<Grid item>
+							<Button onClick={props.SwitchModes} variant="contained" color="grey">
+								{"Don't have an account? Sign Up"}
+							</Button>
+						</Grid>
 					</Grid>
-				</Grid>
+				</Box>
 			</Box>
-		</Box>
-
+		</>
 	);
 }
 
@@ -199,6 +209,15 @@ class LoginRegister extends React.Component {
 		};
 
 		this.UpdateRegistering = () => this.setState({isRegistering: !this.state.isRegistering});
+
+		axios.post("/admin/session/resume", {}).then(
+			(res) => {
+				this.props.SetUser(res.data, true);
+			},
+			() => {
+				console.log("New Session. User Must Login");
+			}
+		);
 	}
 
 	render() {

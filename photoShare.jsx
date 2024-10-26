@@ -8,8 +8,6 @@ import {
 } from '@mui/material';
 import './styles/main.css';
 
-//import axios from 'axios';
-
 // import necessary components
 import TopBar from './components/topBar/TopBar';
 import UserDetail from './components/userDetail/userDetail';
@@ -38,13 +36,12 @@ class PhotoShare extends React.Component {
 
 
   render() {
-	console.log(`PhotoShare.jsx: ${this.state.active_user._id} ${this.state.isLoggedIn}`);
     return (
       <HashRouter>
       <div>
       <Grid container spacing={8}>
         <Grid item xs={12}>
-          <TopBar ActiveUser={this.state.active_user} SetUser={this.setCurrentUser}/>
+          <TopBar AppState={this.state} SetUser={this.setCurrentUser}/>
         </Grid>
         <div className="main-topbar-buffer"/>
         <Grid item sm={3}>

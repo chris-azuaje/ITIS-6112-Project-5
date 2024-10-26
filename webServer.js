@@ -249,11 +249,13 @@ app.post("/admin/login", function (request, response) {
 
 		else if (request.body.password === result[0].password) {
 				request.session.userid = result[0]._id;
+				request.session.first_name = result[0].first_name;
+				request.session.first_name = result[0].last_name;
 				response.status(200).send(JSON.stringify(
 					{
-						_id: result[0]._id,
-						first_name: result[0].first_name,
-						last_name: result[0].last_name,
+						_id: request.session.userid,
+						first_name: request.session.first_name,
+						last_name: request.session.last_name,
 
 					}
 				));
@@ -269,13 +271,28 @@ app.post("/admin/login", function (request, response) {
 });
 
 app.post("/admin/logout", function(req, res) {
-	if (req.session.userid !== 0) {
+	if (req.session.userid) {
 		req.session.destroy();
 		res.status(200).send();
 
 	} else {
-		console.log("I frew up");
 		res.status(400).send();
+	}
+});
+
+// For checking the session if the user is laready logged in. used for page reloads mainly
+app.post("/admin/session/resume", function(req, res) {
+	if (req.session.userid) {
+		res.status(200).send(JSON.stringify(
+			{
+				_id: req.session.userid,
+				first_name: req.session.first_name,
+				last_name: req.session.last_name,
+	
+			}
+		));
+	} else {
+		res.status(500).send();
 	}
 });
 
