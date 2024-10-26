@@ -67,6 +67,7 @@ app.use(bodyParser.json());
 
 app.get("/", function (request, response) {
   response.send("Simple web server of files from " + __dirname);
+  
 });
 
 /**
@@ -151,13 +152,16 @@ app.get("/test/:p1", function (request, response) {
  * URL /user/list - Returns all the User objects.
  */
 app.get("/user/list", function (request, response) {
+
+	if (!request.session.userid) response.status(401).send();
+
 	User.find({}, '_id first_name last_name').lean().exec()
 	.then( result => {
-		console.log(JSON.stringify(result));
+		//console.log(JSON.stringify(result));
 		response.status(200).send(JSON.stringify(result));
 	})
-	.catch(err => {
-		response.status(500).send(JSON.stringify(err));
+	.catch(() => {
+		response.status(500).end();
 	});
 
 });
@@ -167,6 +171,8 @@ app.get("/user/list", function (request, response) {
  */
 app.get("/user/:id", function (request, response) {
 	const param = request.params.id;
+	
+	if (!request.session.userid) response.status(401).send();
 
 	User.findById(param, 'first_name last_name location description occupation').lean().exec()
 	.then( result => {
@@ -174,8 +180,8 @@ app.get("/user/:id", function (request, response) {
 		else response.status(200).end(JSON.stringify(result));
 
 	})
-	.catch(err => {
-		response.status(500).send(JSON.stringify(err));
+	.catch(() => {
+		response.status(500).end();
 	});
 
 });
@@ -186,6 +192,8 @@ app.get("/user/:id", function (request, response) {
 app.get("/photosOfUser/:id", function (request, response) {
 	const param = request.params.id;
   
+	if (!request.session.userid) response.status(401).send();
+
 	Photo.find({ user_id: param }, 'file_name date_time user_id comments')
 	  .populate({
 		path: 'comments.user_id',
@@ -222,11 +230,54 @@ app.get("/photosOfUser/:id", function (request, response) {
 	  })
 	  .catch(err => {
 		console.error(err);
-		response.status(500).send(JSON.stringify(err));
+		response.status(500).end();
 	  });
   });
 
+app.post("/admin/login", function (request, response) {
 
+	User.find(
+		{login_name: request.body.login_name}, 
+		'password _id first_name last_name'
+	)
+	.lean()
+	.exec()
+	.then( result => {
+		// console.log(result);
+		// If there is no items found, then return 400
+		if (result.length === 0) response.status(400).end(JSON.stringify(result));
+
+		else if (request.body.password === result[0].password) {
+				request.session.userid = result[0]._id;
+				response.status(200).send(JSON.stringify(
+					{
+						_id: result[0]._id,
+						first_name: result[0].first_name,
+						last_name: result[0].last_name,
+
+					}
+				));
+
+		} else {
+			response.status(400).send("Invaid password");
+		}
+
+	})
+	.catch(() => {
+		response.status(500).end();
+	});
+});
+
+app.post("/admin/logout", function(req, res) {
+	if (req.session.userid !== 0) {
+		req.session.destroy();
+		res.status(200).send();
+
+	} else {
+		console.log("I frew up");
+		res.status(400).send();
+	}
+});
 
   
 const server = app.listen(3000, function () {

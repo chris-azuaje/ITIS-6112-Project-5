@@ -4,7 +4,9 @@ import { withRouter, useLocation } from 'react-router-dom';
 // import FetchModel from '../../lib/fetchModelData';
 import axios from 'axios';
 
-function TopBar() {
+import LogoutButton from '../logoutButton/logoutButton';
+
+function TopBar(props) {
   const [version, setVersion] = useState('');
   const [name, setName] = useState({f: '', l:'',});
 
@@ -47,9 +49,6 @@ function TopBar() {
 	}
   }, [location]);
 
-
-
-	//console.log(props);
   return (
     <AppBar className='topbar-appBar' position='absolute'>
       <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -63,6 +62,7 @@ function TopBar() {
             ? `Photos of ${name.f} ${name.l}`
             : ''}
         </Typography>
+		<LogoutButton {...props}/>
         <Typography variant='body2' color='inherit'>
           Version: {version}
         </Typography>

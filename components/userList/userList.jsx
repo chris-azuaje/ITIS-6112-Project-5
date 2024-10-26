@@ -47,7 +47,7 @@ class UserList extends React.Component {
         this.setState({ users: data.data });
       },
       (err) => {
-        console.log(err);
+        console.log(`Status Code UL: ${err.response.status}`);
       }
     );
   }
