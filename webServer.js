@@ -250,7 +250,7 @@ app.post("/admin/login", function (request, response) {
 		else if (request.body.password === result[0].password) {
 				request.session.userid = result[0]._id;
 				request.session.first_name = result[0].first_name;
-				request.session.first_name = result[0].last_name;
+				request.session.last_name = result[0].last_name;
 				response.status(200).send(JSON.stringify(
 					{
 						_id: request.session.userid,
