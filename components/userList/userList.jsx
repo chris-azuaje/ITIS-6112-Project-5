@@ -22,7 +22,7 @@ class UserList extends React.Component {
 
     this.state = {
       users: [],
-	  mustLogin: false,
+      mustLogin: false,
     };
 
     this.getUsers();
@@ -35,46 +35,41 @@ class UserList extends React.Component {
       },
       (err) => {
         console.log(`Status Code UL: ${err.response.status}`);
-		this.setState({mustLogin: true});
+        this.setState({ mustLogin: true });
       }
     );
   }
 
   render() {
-    return (
-	(this.state.mustLogin) ?
-	<Typography variant="h5">Please Login to View Users</Typography>
-	:
-	(this.state.users.length === 0) ?
-	<p>Loading Users</p>
-	:
-	(
-	<div>
-		<List component='nav'>
-			{this.state.users.map((user) => (
-			<div key={user._id}>
-				<ListItem>
-					<ListItemAvatar>
-					<Avatar
-						alt={`${user.first_name}`}
-						src='#'
-					/>
-					</ListItemAvatar>
-					<ListItemText
-						primary={(
-							<Link to={`/users/${user._id}`}>
-								{user.first_name} {user.last_name}
-							</Link>
-						)}
-						key={user._id} 
-					/>
-				</ListItem>
-				<Divider />
-			</div>
-			))}
-		</List>
-	</div>
-	));
+    return this.state.mustLogin ? (
+      <Typography variant='h5'>Please Login to View Users</Typography>
+    ) : this.state.users.length === 0 ? (
+      <p>Loading Users</p>
+    ) : (
+      <div>
+        <List component='nav'>
+          {this.state.users.map((user) => (
+            <div key={user._id}>
+              <ListItem>
+                <ListItemAvatar>
+                  <Avatar alt={`${user.first_name}`} src='#' />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Link to={`/users/${user._id}`}>
+                      {user.first_name} {user.last_name}
+                    </Link>
+                  }
+                  key={user._id}
+                  className='listItemText'
+                />
+              </ListItem>
+              <Divider />
+            </div>
+          ))}
+        </List>
+      </div>
+    );
   }
 }
 

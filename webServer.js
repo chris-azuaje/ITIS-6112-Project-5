@@ -31,28 +31,26 @@
  *                      (JSON format).
  */
 
-const mongoose = require("mongoose");
-mongoose.Promise = require("bluebird");
+const mongoose = require('mongoose');
+mongoose.Promise = require('bluebird');
 
-const async = require("async");
+const async = require('async');
 
-const express = require("express");
+const express = require('express');
 const app = express();
 
-const session = require("express-session");
-const bodyParser = require("body-parser");
-const multer = require("multer");
+const session = require('express-session');
+const bodyParser = require('body-parser');
+const multer = require('multer');
 
 // Load the Mongoose schema for User, Photo, and SchemaInfo
-const User = require("./schema/user.js");
-const Photo = require("./schema/photo.js");
-const SchemaInfo = require("./schema/schemaInfo.js");
+const User = require('./schema/user.js');
+const Photo = require('./schema/photo.js');
+const SchemaInfo = require('./schema/schemaInfo.js');
 
-// XXX - Your submission should work without this line. Comment out or delete
 // this line for tests and before submission!
-//const models = require("./modelData/photoApp.js").models;
-mongoose.set("strictQuery", false);
-mongoose.connect("mongodb://127.0.0.1/project6", {
+mongoose.set('strictQuery', false);
+mongoose.connect('mongodb://127.0.0.1/project6', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -61,65 +59,61 @@ mongoose.connect("mongodb://127.0.0.1/project6", {
 // (http://expressjs.com/en/starter/static-files.html) do all the work for us.
 app.use(express.static(__dirname));
 
-app.use(session({secret: "secretKey", resave: false, saveUninitialized: false}));
+app.use(
+  session({ secret: 'secretKey', resave: false, saveUninitialized: false })
+);
 app.use(bodyParser.json());
 
-
-app.get("/", function (request, response) {
-  response.send("Simple web server of files from " + __dirname);
-  
+app.get('/', function (request, response) {
+  response.send('Simple web server of files from ' + __dirname);
 });
 
 /**
- * Use express to handle argument passing in the URL. This .get will cause
- * express to accept URLs with /test/<something> and return the something in
- * request.params.p1.
- * 
+ * Use express to handle argument passing in the URL. This .get will cause express to accept URLs with /test/<something> and return the something in request.params.p1.
+ *
  * If implement the get as follows:
- * /test        - Returns the SchemaInfo object of the database in JSON format.
- *                This is good for testing connectivity with MongoDB.
+ * /test - Returns the SchemaInfo object of the database in JSON format. This is good for testing connectivity with MongoDB.
  * /test/info   - Same as /test.
- * /test/counts - Returns an object with the counts of the different collections
- *                in JSON format.
+ * /test/counts - Returns an object with the counts of the different collections in JSON format.
  */
-app.get("/test/:p1", function (request, response) {
-  // Express parses the ":p1" from the URL and returns it in the request.params
-  // objects.
-  console.log("/test called with param1 = ", request.params.p1);
 
-  const param = request.params.p1 || "info";
+app.get('/test/:p1', function (request, response) {
+  // Express parses the ":p1" from the URL and returns it in the request.params objects.
+  console.log('/test called with param1 = ', request.params.p1);
 
-  if (param === "info") {
+  const param = request.params.p1 || 'info';
+
+  if (param === 'info') {
     // Fetch the SchemaInfo. There should only one of them. The query of {} will
     // match it.
     SchemaInfo.find({}, function (err, info) {
       if (err) {
         // Query returned an error. We pass it back to the browser with an
         // Internal Service Error (500) error code.
-        console.error("Error in /user/info:", err);
+        console.error('Error in /user/info:', err);
         response.status(500).send(JSON.stringify(err));
         return;
       }
       if (info.length === 0) {
         // Query didn't return an error but didn't find the SchemaInfo object -
         // This is also an internal error return.
-        response.status(500).send("Missing SchemaInfo");
+        response.status(500).send('Missing SchemaInfo');
         return;
       }
 
       // We got the object - return it in JSON format.
-      console.log("SchemaInfo", info[0]);
+      console.log('SchemaInfo', info[0]);
       response.end(JSON.stringify(info[0]));
     });
-  } else if (param === "counts") {
+  } else if (param === 'counts') {
     // In order to return the counts of all the collections we need to do an
     // async call to each collections. That is tricky to do so we use the async
     // package do the work. We put the collections into array and use async.each
     // to do each .count() query.
     const collections = [
-      { name: "user", collection: User },
-      { name: "photo", collection: Photo },
-      { name: "schemaInfo", collection: SchemaInfo },
+      { name: 'user', collection: User },
+      { name: 'photo', collection: Photo },
+      { name: 'schemaInfo', collection: SchemaInfo },
     ];
     async.each(
       collections,
@@ -144,165 +138,153 @@ app.get("/test/:p1", function (request, response) {
   } else {
     // If we know understand the parameter we return a (Bad Parameter) (400)
     // status.
-    response.status(400).send("Bad param " + param);
+    response.status(400).send('Bad param ' + param);
   }
 });
 
-/**
- * URL /user/list - Returns all the User objects.
- */
-app.get("/user/list", function (request, response) {
+// URL /user/list - Returns all the User objects.
+app.get('/user/list', function (request, response) {
+  if (!request.session.userid) response.status(401).send();
 
-	if (!request.session.userid) response.status(401).send();
-
-	User.find({}, '_id first_name last_name').lean().exec()
-	.then( result => {
-		//console.log(JSON.stringify(result));
-		response.status(200).send(JSON.stringify(result));
-	})
-	.catch(() => {
-		response.status(500).end();
-	});
-
+  User.find({}, '_id first_name last_name')
+    .lean()
+    .exec()
+    .then((result) => {
+      //console.log(JSON.stringify(result));
+      response.status(200).send(JSON.stringify(result));
+    })
+    .catch(() => {
+      response.status(500).end();
+    });
 });
 
-/**
- * URL /user/:id - Returns the information for User (id).
- */
-app.get("/user/:id", function (request, response) {
-	const param = request.params.id;
-	
-	if (!request.session.userid) response.status(401).send();
+// URL /user/:id - Returns the information for User (id).
+app.get('/user/:id', function (request, response) {
+  const param = request.params.id;
 
-	User.findById(param, 'first_name last_name location description occupation').lean().exec()
-	.then( result => {
-		if (result === null) response.status(400).end(JSON.stringify(result));
-		else response.status(200).end(JSON.stringify(result));
+  if (!request.session.userid) response.status(401).send();
 
-	})
-	.catch(() => {
-		response.status(500).end();
-	});
-
+  User.findById(param, 'first_name last_name location description occupation')
+    .lean()
+    .exec()
+    .then((result) => {
+      if (result === null) response.status(400).end(JSON.stringify(result));
+      else response.status(200).end(JSON.stringify(result));
+    })
+    .catch(() => {
+      response.status(500).end();
+    });
 });
 
-/**
- * URL /photosOfUser/:id - Returns the Photos for User (id).
- */
-app.get("/photosOfUser/:id", function (request, response) {
-	const param = request.params.id;
-  
-	if (!request.session.userid) response.status(401).send();
+// URL /photosOfUser/:id - Returns the Photos for User (id).
+app.get('/photosOfUser/:id', function (request, response) {
+  const param = request.params.id;
 
-	Photo.find({ user_id: param }, 'file_name date_time user_id comments')
-	  .populate({
-		path: 'comments.user_id',
-		select: 'first_name last_name _id'
-	  })
-	  .lean()
-	  .exec()
-	  .then(result => {
-		if (result.length === 0) {
-		  response.status(400).end();
-		}
-  
-		// Copies values from 'user_id' into a new 'user' property. 
-		// This is because the user_id prop is used as a joiner and contains 
-		// user data assocaited with user_id
-		const transformedResult = result.map(photo => {
-		  const transformedComments = photo.comments.map(comment => ({
-			...comment,
-			user: comment.user_id,
-		  }));
-  
-		  return {
-			...photo,
-			comments: transformedComments,
-		  };
-		});
-  
-		// Remove user_id from comments
-		transformedResult.forEach(photo => {
-		  photo.comments.forEach(comment => delete comment.user_id);
-		});
-  
-		response.status(200).json(transformedResult);
-	  })
-	  .catch(err => {
-		console.error(err);
-		response.status(500).end();
-	  });
-  });
+  if (!request.session.userid) response.status(401).send();
 
-app.post("/admin/login", function (request, response) {
+  Photo.find({ user_id: param }, 'file_name date_time user_id comments')
+    .populate({
+      path: 'comments.user_id',
+      select: 'first_name last_name _id',
+    })
+    .lean()
+    .exec()
+    .then((result) => {
+      if (result.length === 0) {
+        response.status(400).end();
+      }
 
-	User.find(
-		{login_name: request.body.login_name}, 
-		'password _id first_name last_name'
-	)
-	.lean()
-	.exec()
-	.then( result => {
-		// console.log(result);
-		// If there is no items found, then return 400
-		if (result.length === 0) response.status(400).end(JSON.stringify(result));
+      // Copies values from 'user_id' into a new 'user' property.
+      // This is because the user_id prop is used as a joiner and contains
+      // user data assocaited with user_id
+      const transformedResult = result.map((photo) => {
+        const transformedComments = photo.comments.map((comment) => ({
+          ...comment,
+          user: comment.user_id,
+        }));
 
-		else if (request.body.password === result[0].password) {
-				request.session.userid = result[0]._id;
-				request.session.first_name = result[0].first_name;
-				request.session.last_name = result[0].last_name;
-				response.status(200).send(JSON.stringify(
-					{
-						_id: request.session.userid,
-						first_name: request.session.first_name,
-						last_name: request.session.last_name,
+        return {
+          ...photo,
+          comments: transformedComments,
+        };
+      });
 
-					}
-				));
+      // Remove user_id from comments
+      transformedResult.forEach((photo) => {
+        photo.comments.forEach((comment) => delete comment.user_id);
+      });
 
-		} else {
-			response.status(400).send("Invaid password");
-		}
-
-	})
-	.catch(() => {
-		response.status(500).end();
-	});
+      response.status(200).json(transformedResult);
+    })
+    .catch((err) => {
+      console.error(err);
+      response.status(500).end();
+    });
 });
 
-app.post("/admin/logout", function(req, res) {
-	if (req.session.userid) {
-		req.session.destroy();
-		res.status(200).send();
+app.post('/admin/login', function (request, response) {
+  User.find(
+    { login_name: request.body.login_name },
+    'password _id first_name last_name'
+  )
+    .lean()
+    .exec()
+    .then((result) => {
+      // console.log(result);
+      // If there is no items found, then return 400
+      if (result.length === 0) response.status(400).end(JSON.stringify(result));
+      else if (request.body.password === result[0].password) {
+        request.session.userid = result[0]._id;
+        request.session.first_name = result[0].first_name;
+        request.session.last_name = result[0].last_name;
+        response.status(200).send(
+          JSON.stringify({
+            _id: request.session.userid,
+            first_name: request.session.first_name,
+            last_name: request.session.last_name,
+          })
+        );
+      } else {
+        response.status(400).send('Invaid password');
+      }
+    })
+    .catch(() => {
+      response.status(500).end();
+    });
+});
 
-	} else {
-		res.status(400).send();
-	}
+app.post('/admin/logout', function (req, res) {
+  if (req.session.userid) {
+    req.session.destroy();
+    res.status(200).send();
+  } else {
+    res.status(400).send();
+  }
 });
 
 // For checking the session if the user is laready logged in. used for page reloads mainly
-app.post("/admin/session/resume", function(req, res) {
-	if (req.session.userid) {
-		res.status(200).send(JSON.stringify(
-			{
-				_id: req.session.userid,
-				first_name: req.session.first_name,
-				last_name: req.session.last_name,
-	
-			}
-		));
-	} else {
-		res.status(500).send();
-	}
+app.post('/admin/session/resume', function (req, res) {
+  if (req.session.userid) {
+    res.status(200).send(
+      JSON.stringify({
+        _id: req.session.userid,
+        first_name: req.session.first_name,
+        last_name: req.session.last_name,
+      })
+    );
+  } else {
+    res.status(500).send();
+  }
 });
 
-  
+app.post('/photos/new', (req, res) => {});
+
 const server = app.listen(3000, function () {
   const port = server.address().port;
   console.log(
-    "Listening at http://localhost:" +
+    'Listening at http://localhost:' +
       port +
-      " exporting the directory " +
+      ' exporting the directory ' +
       __dirname
   );
 });
