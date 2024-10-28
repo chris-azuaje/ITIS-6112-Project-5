@@ -26,7 +26,6 @@ class UserDetail extends React.Component {
     axios.get(`/user/${this.props.match.params.userId}`).then(
       (data) => {
         this.setState({ user: data.data });
-		
       },
       (err) => {
         console.log(err);
@@ -35,35 +34,44 @@ class UserDetail extends React.Component {
   }
 
   render() {
-    return (
-		(this.state.user.length === 0) ?
-		<p>Loading user details</p>
-		:
-		(
-			<>
-				<Typography variant='h2'>User Details</Typography>
-				<Typography variant='body1'>
-					Name: {`${this.state.user.first_name} ${this.state.user.last_name}`}
-				</Typography>
-				<Typography variant='body1'>
-					Location: {this.state.user.location}
-				</Typography>
-				<Typography variant='body1'>
-					Description: {this.state.user.description}
-				</Typography>
-				<Typography variant='body1'>
-					Occupation: {this.state.user.occupation}
-				</Typography>
-				<Button
-					variant='contained'
-					color='primary'
-					onClick={this.handleViewPhotosClick}
-				>
-					View Photos
-				</Button>
-			</>
-		)
-	);
+    return this.state.user.length === 0 ? (
+      <p>Loading user details</p>
+    ) : (
+      <div className='user-details-container'>
+        <Typography
+          className='user-details-header'
+          variant='h2'
+          sx={{ fontSize: '40px' }}
+        >
+          User Details
+        </Typography>
+        <div className='user-details-main'>
+          <Typography variant='body1'>
+            <strong>Name: </strong>
+            {`${this.state.user.first_name} ${this.state.user.last_name}`}
+          </Typography>
+          <Typography variant='body1'>
+            <strong>Location: </strong>
+            {this.state.user.location}
+          </Typography>
+          <Typography variant='body1'>
+            <strong>Description: </strong>
+            {this.state.user.description}
+          </Typography>
+          <Typography variant='body1'>
+            <strong>Occupation: </strong>
+            {this.state.user.occupation}
+          </Typography>
+        </div>
+        <Button
+          variant='contained'
+          color='primary'
+          onClick={this.handleViewPhotosClick}
+        >
+          View Photos
+        </Button>
+      </div>
+    );
   }
 }
 

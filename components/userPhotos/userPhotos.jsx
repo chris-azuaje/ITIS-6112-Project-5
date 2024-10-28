@@ -13,7 +13,7 @@ function UserPhotos() {
   const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
   const history = useHistory();
 
-useEffect(() => {
+  useEffect(() => {
     axios
       .get(`/photosOfUser/${userId}`)
       .then((response) => {
@@ -30,36 +30,45 @@ useEffect(() => {
       });
   }, [userId, photoIndex]);
 
+  // Show advanced features
   const handleCheckboxChange = () => {
     setShowAdvancedFeatures(!showAdvancedFeatures);
   };
 
+  // Go back to user details
   const handleGoBack = () => {
     history.push(`/users/${userId}`);
   };
 
+  // Advanced features next photo
   const handleNextPhoto = () => {
     if (currentPhotoIndex < photos.length - 1) {
       setCurrentPhotoIndex(currentPhotoIndex + 1);
     }
   };
 
+  // Advanced features previous photo
   const handlePreviousPhoto = () => {
     if (currentPhotoIndex > 0) {
       setCurrentPhotoIndex(currentPhotoIndex - 1);
     }
   };
 
-  return (
-	(photos.length === 0) ?
-	<p>Loading...</p>
-	:
-    (
-	<div className='user-photos-container'>
-      <Button variant='contained' color='primary' onClick={handleGoBack}>
-        Go back to user details
-      </Button>
-      <Typography variant='h2'>Photos</Typography>
+  // If user has no photos, "loading" otherwise display photos and comments
+  return photos.length === 0 ? (
+    <p>Loading...</p>
+  ) : (
+    // Photos header section
+    <div className='user-photos-container'>
+      <div className='user-photos-header'>
+        <Typography variant='h2' sx={{ fontSize: '40px' }}>
+          Photos
+        </Typography>
+        <Button variant='contained' color='primary' onClick={handleGoBack}>
+          Go back to user details
+        </Button>
+      </div>
+      {/* Advanced features check box and buttons */}
       <Checkbox
         checked={showAdvancedFeatures}
         onChange={handleCheckboxChange}
@@ -80,6 +89,7 @@ useEffect(() => {
           </Button>
         </div>
       )}
+      {/* Advanced features checked layout */}
       {showAdvancedFeatures ? (
         <div className='photo'>
           <img
@@ -87,7 +97,11 @@ useEffect(() => {
             alt={photos[currentPhotoIndex].file_name}
           />
           <p>Creation Date/Time: {photos[currentPhotoIndex].date_time}</p>
-          <Typography variant='h3'>Comments</Typography>
+
+          {/* Comments in advanced view */}
+          <Typography variant='h3' sx={{ fontSize: '38px' }}>
+            Comments
+          </Typography>
           {photos[currentPhotoIndex].comments &&
           photos[currentPhotoIndex].comments.length > 0 ? (
             <ul className='comments'>
@@ -96,9 +110,9 @@ useEffect(() => {
                   <p>Comment Date/Time: {comment.date_time}</p>
                   <p>
                     Comment by:{'  '}
-					<Link to={`/users/${comment.user._id}`}>
-                        {`${comment.user.first_name} ${comment.user.last_name}`}
-					</Link>
+                    <Link to={`/users/${comment.user._id}`}>
+                      {`${comment.user.first_name} ${comment.user.last_name}`}
+                    </Link>
                   </p>
                   <p>Comment: {comment.comment}</p>
                 </li>
@@ -109,6 +123,7 @@ useEffect(() => {
           )}
         </div>
       ) : (
+        // Advanced features non-checked layout
         photos.map((photo, index) => (
           <div
             key={photo._id}
@@ -117,20 +132,33 @@ useEffect(() => {
             }`}
           >
             <img src={`/images/${photo.file_name}`} alt={photo.file_name} />
-            <p>Creation Date/Time: {photo.date_time}</p>
-            <Typography variant='h3'>Comments</Typography>
+            <p>
+              <strong>Creation Date/Time: </strong>
+              {photo.date_time}
+            </p>
+
+            {/* Comments in non-advanced view */}
+            <Typography variant='h3' className='user-photos-comment-header'>
+              Comments
+            </Typography>
             {photo.comments && photo.comments.length > 0 ? (
               <ul className='comments'>
                 {photo.comments.map((comment) => (
                   <li key={comment._id} className='comment'>
-                    <p>Comment Date/Time: {comment.date_time}</p>
                     <p>
-                      Comment by:{' '}
+                      <strong>Comment Date/Time: </strong>
+                      {comment.date_time}
+                    </p>
+                    <p>
+                      <strong>Comment by: </strong>{' '}
                       <Link to={`/users/${comment.user._id}`}>
                         {`${comment.user.first_name} ${comment.user.last_name}`}
                       </Link>
                     </p>
-                    <p>Comment: {comment.comment}</p>
+                    <p>
+                      <strong>Comment: </strong>
+                      {comment.comment}
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -141,9 +169,21 @@ useEffect(() => {
             )}
           </div>
         ))
-      	)}
-	</div>
-	)
+      )}
+      {/* <div className='add-photos'>
+        <Button variant='contained' color='primary'>
+          Add Photo
+        </Button>
+        <input
+          type='file'
+          accept='image/*'
+          ref={(domFileRef) => {
+            this.uploadInput = domFileRef;
+          }
+          }
+        />
+      </div> */}
+    </div>
   );
 }
 
