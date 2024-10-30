@@ -33,6 +33,7 @@
 
 const mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
+const fs = require('fs');
 
 const async = require('async');
 
@@ -42,6 +43,9 @@ const app = express();
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const multer = require('multer');
+const processFormBody = multer({ storage: multer.memoryStorage() }).single(
+  'uploadedphoto'
+);
 
 // Load the Mongoose schema for User, Photo, and SchemaInfo
 const User = require('./schema/user.js');
@@ -277,7 +281,34 @@ app.post('/admin/session/resume', function (req, res) {
   }
 });
 
-app.post('/photos/new', (req, res) => {});
+app.post('/photos/new', (request, response) => {
+  processFormBody(request, response, function (err) {
+    if (err || !request.file) {
+      // XXX -  Insert error handling code here.
+      response.send(400).send();
+      return;
+    }
+    const timestamp = new Date().valueOf();
+    const filename = 'U' + String(timestamp) + request.file.originalname;
+
+    fs.writeFile('./images/' + filename, request.file.buffer, function (err) {
+      // XXX - Once you have the file written into your images directory under the
+      // name filename you can create the Photo object in the database
+      Photo.create({
+        file_name: filename,
+        date_time: timestamp,
+        user_id: request.session.userid,
+        comment: [],
+      })
+        .then((result) => {
+          response.status(200).send();
+        })
+        .catch((err) => {
+          response.status(500).send();
+        });
+    });
+  });
+});
 
 const server = app.listen(3000, function () {
   const port = server.address().port;

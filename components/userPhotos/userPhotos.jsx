@@ -12,6 +12,24 @@ function UserPhotos() {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
   const history = useHistory();
+  const [, setReload] = useState();
+
+  let uploadInput = '';
+  let handleUploadButtonClicked = (e) => {
+    e.preventDefault();
+    if (uploadInput.files.length > 0) {
+      // Create a DOM form and add the file to it under the name uploadedphoto
+      const domForm = new FormData();
+      domForm.append('uploadedphoto', uploadInput.files[0]);
+
+      axios
+        .post('/photos/new', domForm)
+        .then((res) => {
+          setReload(true);
+        })
+        .catch((err) => console.log(`POST ERR: ${err}`));
+    }
+  };
 
   useEffect(() => {
     axios
@@ -170,19 +188,18 @@ function UserPhotos() {
           </div>
         ))
       )}
-      {/* <div className='add-photos'>
-        <Button variant='contained' color='primary'>
-          Add Photo
-        </Button>
-        <input
-          type='file'
-          accept='image/*'
-          ref={(domFileRef) => {
-            this.uploadInput = domFileRef;
-          }
-          }
-        />
-      </div> */}
+      <div className='add-photos'>
+        <form action='' onSubmit={handleUploadButtonClicked}>
+          <input
+            type='file'
+            accept='image/*'
+            ref={(domFileRef) => {
+              uploadInput = domFileRef;
+            }}
+          />
+          <input value='Submit Photo' type='submit' id='submit-photo-btn' />
+        </form>
+      </div>
     </div>
   );
 }
