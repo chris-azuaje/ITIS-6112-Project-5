@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Button, Checkbox } from '@mui/material';
+import { Typography, Button, Checkbox,TextField } from '@mui/material';
 import { Link, useParams, useHistory } from 'react-router-dom';
 // import FetchModel from '../../lib/fetchModelData';
 import './userPhotos.css'; // Change this if you create a specific CSS for user photos
@@ -8,9 +8,12 @@ import axios from 'axios';
 function UserPhotos() {
   const { userId, photoIndex } = useParams();
   const [photos, setPhotos] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  
   const [, setAdvancedFeaturesEnabled] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const history = useHistory();
 
   useEffect(() => {
@@ -28,7 +31,7 @@ function UserPhotos() {
       .catch((error) => {
         console.error('Error fetching user photos:', error);
       });
-  }, [userId, photoIndex]);
+  }, [userId, photoIndex,refresh]);
 
   // Show advanced features
   const handleCheckboxChange = () => {
@@ -53,6 +56,29 @@ function UserPhotos() {
       setCurrentPhotoIndex(currentPhotoIndex - 1);
     }
   };
+
+  
+  
+  const handleCommentChange = (event) => {
+    setNewComment(event.target.value);
+  };
+
+  const handleCommentSubmit = (id) => {
+    axios
+      .post(`/commentsOfPhoto/${id}`, {
+        comment: newComment,
+        userId: userId,
+      })
+      .then((response) => {
+        onCommentAdded(response.data); 
+        setNewComment('');
+        setRefresh(!refresh);
+      })
+      .catch((error) => {
+        console.error('Error adding comment:', error);
+      });
+  };
+  
 
   // If user has no photos, "loading" otherwise display photos and comments
   return photos.length === 0 ? (
@@ -167,9 +193,29 @@ function UserPhotos() {
                 No comments for this photo
               </Typography>
             )}
+            <div>
+              <TextField
+                label="Add a comment"
+                value={newComment}
+                onChange={handleCommentChange}
+                multiline
+                rows={4}
+                variant="outlined"
+                fullWidth
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={()=>{handleCommentSubmit(photo._id)}}
+                disabled={!newComment.trim()}
+              >
+                Submit
+              </Button>
+              </div>
           </div>
         ))
       )}
+      
       {/* <div className='add-photos'>
         <Button variant='contained' color='primary'>
           Add Photo
