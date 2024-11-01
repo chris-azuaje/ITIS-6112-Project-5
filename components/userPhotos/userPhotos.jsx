@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Button, Checkbox } from '@mui/material';
+import { Typography, Button, Checkbox, TextField } from '@mui/material';
 import { Link, useParams, useHistory } from 'react-router-dom';
 // import FetchModel from '../../lib/fetchModelData';
 import './userPhotos.css'; // Change this if you create a specific CSS for user photos
@@ -13,6 +13,7 @@ function UserPhotos(props) {
   const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
   const history = useHistory();
   const [reload, setReload] = useState();
+  const [newComment, setNewComment] = useState('');
 
   let uploadInput = '';
   let handleUploadButtonClicked = (e) => {
@@ -47,6 +48,27 @@ function UserPhotos(props) {
         console.error('Error fetching user photos:', error);
       });
   }, [userId, photoIndex, reload]);
+
+
+  const handleCommentChange = (event) => {
+    setNewComment(event.target.value);
+  };
+
+  const handleCommentSubmit = (id) => {
+    axios
+      .post(`/commentsOfPhoto/${id}`, {
+        comment: newComment,
+        userId: userId,
+      })
+      .then(() => {
+        setNewComment('');
+		document.getElementById(`commentBox${id}`).value = '';
+        setReload(preload => !preload);
+      })
+      .catch((error) => {
+        console.error('Error adding comment:', error);
+      });
+  };
 
   // Show advanced features
   const handleCheckboxChange = () => {
@@ -185,6 +207,26 @@ function UserPhotos(props) {
                 No comments for this photo
               </Typography>
             )}
+			<div>
+				<TextField
+					label="Add a comment"
+					onChange={handleCommentChange}
+					multiline
+					rows={4}
+					variant="outlined"
+					fullWidth
+					id={`commentBox${photo._id}`}
+					key={photo._id}
+				/>
+				<Button
+					variant="contained"
+					color="primary"
+					onClick={()=>{handleCommentSubmit(photo._id)}}
+					disabled={!newComment.trim()}
+				>
+				Submit
+				</Button>
+			</div>
           </div>
         ))
       )}

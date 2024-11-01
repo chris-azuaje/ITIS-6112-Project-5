@@ -310,6 +310,52 @@ app.post('/photos/new', (request, response) => {
   });
 });
 
+app.post("/commentsOfPhoto/:photo_id", function (request, response) {
+	if (!request.session.userid) return response.status(401).send();
+  
+	const photoId = request.params.photo_id || "";
+	const userId = request.session.userid || "";
+	const commentText = request.body.comment || "";
+	// Validate and convert photo_id and user_id to ObjectId if valid
+	console.log(photoId);
+	console.log(userId);
+	const photoObjectId = new mongoose.Types.ObjectId(photoId);
+	const userObjectId = new mongoose.Types.ObjectId(userId);
+	if (!photoObjectId) {
+	  return response.status(400).send("Invalid photo ID format");
+	}
+	if (!userObjectId) {
+	  return response.status(400).send("Invalid user ID format");
+	}
+	if (commentText === "") {
+	  return response.status(400).send("Comment required");
+	}
+	// Find the photo and add the comment
+	Photo.findById(photoObjectId, function (err, photo) {
+	  if (err) {
+		console.error("Error finding photo:", err);
+		return response.status(500).send("Error finding photo");
+	  }
+	  if (!photo) {
+		return response.status(404).send("Photo not found");
+	  }
+	  const newComment = {
+		comment: commentText,
+		date_time: new Date(),
+		user_id: userObjectId,
+		_id: new mongoose.Types.ObjectId(), // New unique ID for the comment
+	  };
+	  photo.comments.push(newComment);
+	  photo.save(function (saveErr) {
+		if (saveErr) {
+		  console.error("Error saving comment:", saveErr);
+		  return response.status(500).send("Error saving comment");
+		}
+		response.status(200).send("Comment added successfully");
+	  });
+	});
+  });
+
 const server = app.listen(3000, function () {
   const port = server.address().port;
   console.log(
