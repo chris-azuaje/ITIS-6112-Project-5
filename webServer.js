@@ -278,6 +278,8 @@ app.post("/admin/session/resume", function (req, res) {
 });
 
 app.post("/photos/new", (req, res) => {});
+
+
 app.post("/commentsOfPhoto/:photo_id", function (request, response) {
   if (!request.session.userid) return response.status(401).send();
 

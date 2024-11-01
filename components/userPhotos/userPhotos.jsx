@@ -69,15 +69,16 @@ function UserPhotos() {
         comment: newComment,
         userId: userId,
       })
-      .then((response) => {
-        onCommentAdded(response.data); 
+      .then(() => { // removed 'response' as a parameter, wasnt being used
+        //onCommentAdded(response.data); // Commented out bc this doesnt seem to do anything
         setNewComment('');
-        setRefresh(!refresh);
+		document.getElementById(`commentBox${id}`).value = '';
+        setRefresh((prefresh) => !prefresh);
       })
       .catch((error) => {
         console.error('Error adding comment:', error);
-      });
-  };
+	  });
+	};
   
 
   // If user has no photos, "loading" otherwise display photos and comments
@@ -193,25 +194,26 @@ function UserPhotos() {
                 No comments for this photo
               </Typography>
             )}
-            <div>
-              <TextField
-                label="Add a comment"
-                value={newComment}
-                onChange={handleCommentChange}
-                multiline
-                rows={4}
-                variant="outlined"
-                fullWidth
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={()=>{handleCommentSubmit(photo._id)}}
-                disabled={!newComment.trim()}
-              >
-                Submit
-              </Button>
-              </div>
+			<div>
+				<TextField
+					label="Add a comment"
+					onChange={handleCommentChange}
+					multiline
+					rows={4}
+					variant="outlined"
+					fullWidth
+					key={photo._id}
+					id={`commentBox${photo._id}`}
+				/>
+				<Button
+					variant="contained"
+					color="primary"
+					onClick={()=>{handleCommentSubmit(photo._id);}}
+					disabled={!newComment.trim()}
+				>
+					Submit
+				</Button>
+			</div>
           </div>
         ))
       )}
