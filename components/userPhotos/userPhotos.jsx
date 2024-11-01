@@ -5,14 +5,14 @@ import { Link, useParams, useHistory } from 'react-router-dom';
 import './userPhotos.css'; // Change this if you create a specific CSS for user photos
 import axios from 'axios';
 
-function UserPhotos() {
+function UserPhotos(props) {
   const { userId, photoIndex } = useParams();
   const [photos, setPhotos] = useState([]);
   const [, setAdvancedFeaturesEnabled] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
   const history = useHistory();
-  const [, setReload] = useState();
+  const [reload, setReload] = useState();
 
   let uploadInput = '';
   let handleUploadButtonClicked = (e) => {
@@ -24,8 +24,8 @@ function UserPhotos() {
 
       axios
         .post('/photos/new', domForm)
-        .then((res) => {
-          setReload(true);
+        .then(() => {
+          setReload((preload) => !preload);
         })
         .catch((err) => console.log(`POST ERR: ${err}`));
     }
@@ -46,7 +46,7 @@ function UserPhotos() {
       .catch((error) => {
         console.error('Error fetching user photos:', error);
       });
-  }, [userId, photoIndex]);
+  }, [userId, photoIndex, reload]);
 
   // Show advanced features
   const handleCheckboxChange = () => {
@@ -188,6 +188,8 @@ function UserPhotos() {
           </div>
         ))
       )}
+	  { (props.AppState.active_user._id === userId) ?
+	  (
       <div className='add-photos'>
         <form action='' onSubmit={handleUploadButtonClicked}>
           <input
@@ -200,6 +202,9 @@ function UserPhotos() {
           <input value='Submit Photo' type='submit' id='submit-photo-btn' />
         </form>
       </div>
+  	  )
+	  :
+	  <div></div>}
     </div>
   );
 }
