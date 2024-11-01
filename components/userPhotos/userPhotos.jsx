@@ -5,13 +5,31 @@ import { Link, useParams, useHistory } from 'react-router-dom';
 import './userPhotos.css'; // Change this if you create a specific CSS for user photos
 import axios from 'axios';
 
-function UserPhotos() {
+function UserPhotos(props) {
   const { userId, photoIndex } = useParams();
   const [photos, setPhotos] = useState([]);
   const [, setAdvancedFeaturesEnabled] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
   const history = useHistory();
+  const [reload, setReload] = useState();
+
+  let uploadInput = '';
+  let handleUploadButtonClicked = (e) => {
+    e.preventDefault();
+    if (uploadInput.files.length > 0) {
+      // Create a DOM form and add the file to it under the name uploadedphoto
+      const domForm = new FormData();
+      domForm.append('uploadedphoto', uploadInput.files[0]);
+
+      axios
+        .post('/photos/new', domForm)
+        .then(() => {
+          setReload((preload) => !preload);
+        })
+        .catch((err) => console.log(`POST ERR: ${err}`));
+    }
+  };
 
   useEffect(() => {
     axios
@@ -28,7 +46,7 @@ function UserPhotos() {
       .catch((error) => {
         console.error('Error fetching user photos:', error);
       });
-  }, [userId, photoIndex]);
+  }, [userId, photoIndex, reload]);
 
   // Show advanced features
   const handleCheckboxChange = () => {
@@ -170,19 +188,23 @@ function UserPhotos() {
           </div>
         ))
       )}
-      {/* <div className='add-photos'>
-        <Button variant='contained' color='primary'>
-          Add Photo
-        </Button>
-        <input
-          type='file'
-          accept='image/*'
-          ref={(domFileRef) => {
-            this.uploadInput = domFileRef;
-          }
-          }
-        />
-      </div> */}
+	  { (props.AppState.active_user._id === userId) ?
+	  (
+      <div className='add-photos'>
+        <form action='' onSubmit={handleUploadButtonClicked}>
+          <input
+            type='file'
+            accept='image/*'
+            ref={(domFileRef) => {
+              uploadInput = domFileRef;
+            }}
+          />
+          <input value='Submit Photo' type='submit' id='submit-photo-btn' />
+        </form>
+      </div>
+  	  )
+	  :
+	  <div></div>}
     </div>
   );
 }
