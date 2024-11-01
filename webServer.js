@@ -176,7 +176,7 @@ app.get('/user/:id', function (request, response) {
       else response.status(200).end(JSON.stringify(result));
     })
     .catch(() => {
-      response.status(500).end();
+      response.status(400).end();
     });
 });
 
@@ -222,7 +222,7 @@ app.get('/photosOfUser/:id', function (request, response) {
     })
     .catch((err) => {
       console.error(err);
-      response.status(500).end();
+      response.status(400).end();
     });
 });
 
