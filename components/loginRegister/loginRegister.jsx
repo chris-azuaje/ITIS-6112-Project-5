@@ -92,11 +92,24 @@ function LoginModal(props) {
 }
 
 function RegisterModal(props) {
+  let [, setInvalidRegister] = useState(false);
+
   const RegistrationRequest = (event) => {
     event.preventDefault();
     // TODO: Add registration functionality
     const data = new FormData(event.currentTarget);
-    console.log(data);
+    const plain = Object.fromEntries(data.entries());
+
+    axios.post('/user', plain).then(
+      (res) => {
+        // console.log(res.data);
+        props.SetUser(res.data, true);
+      },
+      (err) => {
+        console.log(err.response.status);
+        setInvalidRegister(true);
+      }
+    );
   };
 
   return (
@@ -219,8 +232,7 @@ class LoginRegister extends React.Component {
       isRegistering: false,
     };
 
-    this.UpdateRegistering = () =>
-      this.setState({ isRegistering: !this.state.isRegistering });
+    this.UpdateRegistering = () => this.setState({ isRegistering: !this.state.isRegistering });
 
     axios.post('/admin/session/resume', {}).then(
       (res) => {

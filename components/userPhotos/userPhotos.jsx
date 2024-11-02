@@ -96,8 +96,27 @@ function UserPhotos(props) {
 
   // If user has no photos, "loading" otherwise display photos and comments
   return photos.length === 0 ? (
-    <p>Loading...</p>
-  ) : (
+	<div>
+		<p>There are no photos!</p>
+		{ (props.AppState.active_user._id === userId) ?
+		(
+		<div className='add-photos'>
+			<form action='' onSubmit={handleUploadButtonClicked}>
+			<input
+				type='file'
+				accept='image/*'
+				ref={(domFileRef) => {
+				uploadInput = domFileRef;
+				}}
+			/>
+			<input value='Submit Photo' type='submit' id='submit-photo-btn' />
+			</form>
+		</div>
+		)
+		:
+		<div></div>}
+	</div>
+  	) : (
     // Photos header section
     <div className='user-photos-container'>
       <div className='user-photos-header'>
@@ -221,7 +240,7 @@ function UserPhotos(props) {
 				<Button
 					variant="contained"
 					color="primary"
-					onClick={()=>{handleCommentSubmit(photo._id)}}
+					onClick={()=>{handleCommentSubmit(photo._id);}}
 					disabled={!newComment.trim()}
 				>
 				Submit

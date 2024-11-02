@@ -56,9 +56,11 @@ class UserList extends React.Component {
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    <Link to={`/users/${user._id}`}>
+                    (
+					<Link to={`/users/${user._id}`}>
                       {user.first_name} {user.last_name}
-                    </Link>
+					</Link>
+					)
                   }
                   key={user._id}
                   className='listItemText'
