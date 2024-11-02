@@ -92,11 +92,24 @@ function LoginModal(props) {
 }
 
 function RegisterModal(props) {
+  let [invalidRegister, setInvalidRegister] = useState(false);
+
   const RegistrationRequest = (event) => {
     event.preventDefault();
     // TODO: Add registration functionality
     const data = new FormData(event.currentTarget);
-    console.log(data);
+    const plain = Object.fromEntries(data.entries());
+
+    axios.post('/user', plain).then(
+      (res) => {
+        // console.log(res.data);
+        props.SetUser(res.data, true);
+      },
+      (err) => {
+        console.log(err.response.status);
+        setInvalidRegister(true);
+      }
+    );
   };
 
   return (
