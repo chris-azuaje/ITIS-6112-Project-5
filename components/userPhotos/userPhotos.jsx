@@ -73,6 +73,17 @@ function UserPhotos(props) {
       });
   };
 
+  const handleDeleteFavorite = (id) => {
+    axios
+      .get(`/deleteFavorite/${id}`)
+      .then(() => {
+        setReload((preload) => !preload);
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+  };
+
   const handleCommentChange = (event) => {
     setNewComment(event.target.value);
   };
@@ -222,11 +233,13 @@ function UserPhotos(props) {
                 </div>
                 <div>
                   {favoritePhotos.includes(photo._id) ? (
-                    <button disabled>Added to favorites</button>
+                    <Button variant="contained" size="small" onClick={() => handleDeleteFavorite(photo._id)}>
+                      Remove from favorites
+                    </Button>
                   ) : (
-                    <button onClick={() => handleFavorite(photo._id)}>
+                    <Button variant="contained" size="small" onClick={() => handleFavorite(photo._id)}>
                       Add to favorites
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>

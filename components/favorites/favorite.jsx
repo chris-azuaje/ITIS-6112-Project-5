@@ -6,6 +6,7 @@ import {
   Card,
   CardMedia,
   CardHeader,
+  Button
 } from "@mui/material";
 import "./Favorite.css";
 import axios from "axios";
@@ -45,9 +46,9 @@ class Favorite extends React.Component {
           <CardHeader
             id="card-fav-header"
             action={
-              <button onClick={(event) => this.handleDeleteFavorite(event)}>
+              <Button variant="contained" size="small" onClick={(event) => this.handleDeleteFavorite(event)}>
                 Remove from favorites
-              </button>
+              </Button>
             }
           />
           <CardMedia
