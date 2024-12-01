@@ -196,7 +196,7 @@ app.get("/photosOfUser/:id", function (request, response) {
     .then((result) => {
       if (result.length === 0) {
         response.status(200).send(result);
-		return;
+        return;
       }
 
       // Copies values from 'user_id' into a new 'user' property.
@@ -262,29 +262,29 @@ app.post("/user", function (request, response) {
       console.error("Error in /user", err);
       response.status(500).send();
     } else if (returnValue) {
-        console.error("Error in /user", returnValue);
-        response.status(400).send();
-      } else {
-        User.create({
-          _id: new mongoose.Types.ObjectId(),
-          first_name: first_name,
-          last_name: last_name,
-          location: location,
-          description: description,
-          occupation: occupation,
-          login_name: login_name,
-          password: password,
+      console.error("Error in /user", returnValue);
+      response.status(400).send();
+    } else {
+      User.create({
+        _id: new mongoose.Types.ObjectId(),
+        first_name: first_name,
+        last_name: last_name,
+        location: location,
+        description: description,
+        occupation: occupation,
+        login_name: login_name,
+        password: password,
+      })
+        .then((user) => {
+          request.session.user_id = user._id;
+          session.user_id = user._id;
+          response.end(JSON.stringify(user));
         })
-          .then((user) => {
-            request.session.user_id = user._id;
-            session.user_id = user._id;
-            response.end(JSON.stringify(user));
-          })
-          .catch((error) => {
-            console.error("Error in /user", error);
-            response.status(500).send();
-          });
-      }
+        .catch((error) => {
+          console.error("Error in /user", error);
+          response.status(500).send();
+        });
+    }
   });
 });
 

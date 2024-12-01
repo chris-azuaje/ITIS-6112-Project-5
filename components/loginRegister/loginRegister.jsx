@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-import { Typography, TextField, Box, Button, Grid, Alert } from '@mui/material';
+import { Typography, TextField, Box, Button, Grid, Alert } from "@mui/material";
 
-import './loginRegister.css';
-import axios from 'axios';
+import "./loginRegister.css";
+import axios from "axios";
 
 function LoginModal(props) {
   let [invalidLogin, setInvalidLogin] = useState(false);
@@ -14,7 +14,7 @@ function LoginModal(props) {
     const data = new FormData(event.currentTarget);
     const plain = Object.fromEntries(data.entries());
 
-    axios.post('/admin/login', plain).then(
+    axios.post("/admin/login", plain).then(
       (res) => {
         // console.log(res.data);
         props.SetUser(res.data, true);
@@ -29,47 +29,47 @@ function LoginModal(props) {
   return (
     <>
       {invalidLogin ? (
-        <Alert severity='error'>
+        <Alert severity="error">
           Incorrect Login Name or Password. Try again.
         </Alert>
       ) : (
-        ''
+        ""
       )}
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <Box component='form' onSubmit={LoginRequest}>
-          <Typography component='h1' variant='h5'>
+        <Box component="form" onSubmit={LoginRequest}>
+          <Typography component="h1" variant="h5">
             Sign In
           </Typography>
 
           <TextField
-            margin='normal'
+            margin="normal"
             required
             autoFocus
             fullWidth
-            label='Login Name'
-            name='login_name'
-            id='login_name'
+            label="Login Name"
+            name="login_name"
+            id="login_name"
           />
 
           <TextField
-            margin='normal'
+            margin="normal"
             required
             fullWidth
-            label='Password'
-            name='password'
-            type='password'
-            id='password'
+            label="Password"
+            name="password"
+            type="password"
+            id="password"
           />
           <Button
-            type='submit'
+            type="submit"
             fullWidth
-            variant='contained'
+            variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
             Login
@@ -78,8 +78,8 @@ function LoginModal(props) {
             <Grid item>
               <Button
                 onClick={props.SwitchModes}
-                variant='contained'
-                color='grey'
+                variant="contained"
+                color="grey"
               >
                 {"Don't have an account? Sign Up"}
               </Button>
@@ -100,7 +100,7 @@ function RegisterModal(props) {
     const data = new FormData(event.currentTarget);
     const plain = Object.fromEntries(data.entries());
 
-    axios.post('/user', plain).then(
+    axios.post("/user", plain).then(
       (res) => {
         // console.log(res.data);
         props.SetUser(res.data, true);
@@ -116,94 +116,94 @@ function RegisterModal(props) {
     <Box
       my={4}
       sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <Box component='form' onSubmit={RegistrationRequest}>
-        <Typography component='h1' variant='h5'>
+      <Box component="form" onSubmit={RegistrationRequest}>
+        <Typography component="h1" variant="h5">
           Register
         </Typography>
 
         <TextField
-          margin='normal'
+          margin="normal"
           required
           autoFocus
           fullWidth
-          label='Login Name'
-          name='login_name'
-          id='login_name'
+          label="Login Name"
+          name="login_name"
+          id="login_name"
         />
 
         <TextField
-          margin='normal'
+          margin="normal"
           required
           fullWidth
-          label='Password'
-          name='password'
-          id='password'
-          type='password'
+          label="Password"
+          name="password"
+          id="password"
+          type="password"
         />
 
         <TextField
-          margin='normal'
+          margin="normal"
           required
           fullWidth
-          label='Verify Password'
-          name='password2'
-          id='password2'
-          type='password'
+          label="Verify Password"
+          name="password2"
+          id="password2"
+          type="password"
         />
         <TextField
-          margin='normal'
+          margin="normal"
           required
-          label='First Name'
-          name='first_name'
-          id='first_name'
-          sx={{ width: '50%' }}
+          label="First Name"
+          name="first_name"
+          id="first_name"
+          sx={{ width: "50%" }}
         />
         <TextField
-          margin='normal'
+          margin="normal"
           required
-          label='Last Name'
-          name='last_name'
-          id='last_name'
-          sx={{ width: '50%' }}
+          label="Last Name"
+          name="last_name"
+          id="last_name"
+          sx={{ width: "50%" }}
         />
 
         <TextField
-          margin='normal'
+          margin="normal"
           required
-          label='Occupation'
-          name='occupation'
-          id='occupation'
-          sx={{ width: '50%' }}
+          label="Occupation"
+          name="occupation"
+          id="occupation"
+          sx={{ width: "50%" }}
         />
 
         <TextField
-          margin='normal'
+          margin="normal"
           required
-          label='Location'
-          name='location'
-          id='location'
-          sx={{ width: '50%' }}
+          label="Location"
+          name="location"
+          id="location"
+          sx={{ width: "50%" }}
         />
 
         <TextField
-          margin='normal'
+          margin="normal"
           required
           fullWidth
           multiline
-          label='Description'
-          name='description'
-          id='description'
+          label="Description"
+          name="description"
+          id="description"
         />
 
         <Button
-          type='submit'
+          type="submit"
           fullWidth
-          variant='contained'
+          variant="contained"
           sx={{ mt: 3, mb: 2 }}
         >
           Login
@@ -212,10 +212,10 @@ function RegisterModal(props) {
           <Grid item>
             <Button
               onClick={props.SwitchModes}
-              variant='contained'
-              color='grey'
+              variant="contained"
+              color="grey"
             >
-              {'Return to Login'}
+              {"Return to Login"}
             </Button>
           </Grid>
         </Grid>
@@ -232,14 +232,15 @@ class LoginRegister extends React.Component {
       isRegistering: false,
     };
 
-    this.UpdateRegistering = () => this.setState({ isRegistering: !this.state.isRegistering });
+    this.UpdateRegistering = () =>
+      this.setState({ isRegistering: !this.state.isRegistering });
 
-    axios.post('/admin/session/resume', {}).then(
+    axios.post("/admin/session/resume", {}).then(
       (res) => {
         this.props.SetUser(res.data, true);
       },
       () => {
-        console.log('New Session. User Must Login');
+        console.log("New Session. User Must Login");
       }
     );
   }
