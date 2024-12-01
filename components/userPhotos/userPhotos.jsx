@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Typography, Button, Checkbox, TextField } from "@mui/material";
-import { Link, useParams, useHistory } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Typography, Button, Checkbox, TextField } from '@mui/material';
+import { Link, useParams, useHistory } from 'react-router-dom';
 // import FetchModel from '../../lib/fetchModelData';
-import "./userPhotos.css"; // Change this if you create a specific CSS for user photos
-import axios from "axios";
+import './userPhotos.css'; // Change this if you create a specific CSS for user photos
+import axios from 'axios';
 
 function UserPhotos(props) {
   const { userId, photoIndex } = useParams();
@@ -13,18 +13,18 @@ function UserPhotos(props) {
   const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
   const history = useHistory();
   const [reload, setReload] = useState();
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState('');
 
-  let uploadInput = "";
+  let uploadInput = '';
   let handleUploadButtonClicked = (e) => {
     e.preventDefault();
     if (uploadInput.files.length > 0) {
       // Create a DOM form and add the file to it under the name uploadedphoto
       const domForm = new FormData();
-      domForm.append("uploadedphoto", uploadInput.files[0]);
+      domForm.append('uploadedphoto', uploadInput.files[0]);
 
       axios
-        .post("/photos/new", domForm)
+        .post('/photos/new', domForm)
         .then(() => {
           setReload((preload) => !preload);
         })
@@ -45,9 +45,10 @@ function UserPhotos(props) {
         }
       })
       .catch((error) => {
-        console.error("Error fetching user photos:", error);
+        console.error('Error fetching user photos:', error);
       });
   }, [userId, photoIndex, reload]);
+
 
   const handleCommentChange = (event) => {
     setNewComment(event.target.value);
@@ -60,12 +61,12 @@ function UserPhotos(props) {
         userId: userId,
       })
       .then(() => {
-        setNewComment("");
-        document.getElementById(`commentBox${id}`).value = "";
-        setReload((preload) => !preload);
+        setNewComment('');
+		document.getElementById(`commentBox${id}`).value = '';
+        setReload(preload => !preload);
       })
       .catch((error) => {
-        console.error("Error adding comment:", error);
+        console.error('Error adding comment:', error);
       });
   };
 
@@ -95,33 +96,34 @@ function UserPhotos(props) {
 
   // If user has no photos, "loading" otherwise display photos and comments
   return photos.length === 0 ? (
-    <div>
-      <p>There are no photos!</p>
-      {props.AppState.active_user._id === userId ? (
-        <div className="add-photos">
-          <form action="" onSubmit={handleUploadButtonClicked}>
-            <input
-              type="file"
-              accept="image/*"
-              ref={(domFileRef) => {
-                uploadInput = domFileRef;
-              }}
-            />
-            <input value="Submit Photo" type="submit" id="submit-photo-btn" />
-          </form>
-        </div>
-      ) : (
-        <div></div>
-      )}
-    </div>
-  ) : (
+	<div>
+		<p>There are no photos!</p>
+		{ (props.AppState.active_user._id === userId) ?
+		(
+		<div className='add-photos'>
+			<form action='' onSubmit={handleUploadButtonClicked}>
+			<input
+				type='file'
+				accept='image/*'
+				ref={(domFileRef) => {
+				uploadInput = domFileRef;
+				}}
+			/>
+			<input value='Submit Photo' type='submit' id='submit-photo-btn' />
+			</form>
+		</div>
+		)
+		:
+		<div></div>}
+	</div>
+  	) : (
     // Photos header section
-    <div className="user-photos-container">
-      <div className="user-photos-header">
-        <Typography variant="h2" sx={{ fontSize: "40px" }}>
+    <div className='user-photos-container'>
+      <div className='user-photos-header'>
+        <Typography variant='h2' sx={{ fontSize: '40px' }}>
           Photos
         </Typography>
-        <Button variant="contained" color="primary" onClick={handleGoBack}>
+        <Button variant='contained' color='primary' onClick={handleGoBack}>
           Go back to user details
         </Button>
       </div>
@@ -129,26 +131,26 @@ function UserPhotos(props) {
       <Checkbox
         checked={showAdvancedFeatures}
         onChange={handleCheckboxChange}
-        inputProps={{ "aria-label": "Show advanced features" }}
+        inputProps={{ 'aria-label': 'Show advanced features' }}
       />
       Show Advanced Features
       {showAdvancedFeatures && (
-        <div className="photo-navigation">
+        <div className='photo-navigation'>
           <Button
-            variant="outlined"
-            color="primary"
+            variant='outlined'
+            color='primary'
             onClick={handlePreviousPhoto}
           >
             Previous
           </Button>
-          <Button variant="outlined" color="primary" onClick={handleNextPhoto}>
+          <Button variant='outlined' color='primary' onClick={handleNextPhoto}>
             Next
           </Button>
         </div>
       )}
       {/* Advanced features checked layout */}
       {showAdvancedFeatures ? (
-        <div className="photo">
+        <div className='photo'>
           <img
             src={`/images/${photos[currentPhotoIndex].file_name}`}
             alt={photos[currentPhotoIndex].file_name}
@@ -156,17 +158,17 @@ function UserPhotos(props) {
           <p>Creation Date/Time: {photos[currentPhotoIndex].date_time}</p>
 
           {/* Comments in advanced view */}
-          <Typography variant="h3" sx={{ fontSize: "38px" }}>
+          <Typography variant='h3' sx={{ fontSize: '38px' }}>
             Comments
           </Typography>
           {photos[currentPhotoIndex].comments &&
           photos[currentPhotoIndex].comments.length > 0 ? (
-            <ul className="comments">
+            <ul className='comments'>
               {photos[currentPhotoIndex].comments.map((comment) => (
-                <li key={comment._id} className="comment">
+                <li key={comment._id} className='comment'>
                   <p>Comment Date/Time: {comment.date_time}</p>
                   <p>
-                    Comment by:{"  "}
+                    Comment by:{'  '}
                     <Link to={`/users/${comment.user._id}`}>
                       {`${comment.user.first_name} ${comment.user.last_name}`}
                     </Link>
@@ -176,7 +178,7 @@ function UserPhotos(props) {
               ))}
             </ul>
           ) : (
-            <Typography variant="body2">No comments for this photo</Typography>
+            <Typography variant='body2'>No comments for this photo</Typography>
           )}
         </div>
       ) : (
@@ -185,7 +187,7 @@ function UserPhotos(props) {
           <div
             key={photo._id}
             className={`photo ${
-              index === currentPhotoIndex ? "visible" : "hidden"
+              index === currentPhotoIndex ? 'visible' : 'hidden'
             }`}
           >
             <img src={`/images/${photo.file_name}`} alt={photo.file_name} />
@@ -195,19 +197,19 @@ function UserPhotos(props) {
             </p>
 
             {/* Comments in non-advanced view */}
-            <Typography variant="h3" className="user-photos-comment-header">
+            <Typography variant='h3' className='user-photos-comment-header'>
               Comments
             </Typography>
             {photo.comments && photo.comments.length > 0 ? (
-              <ul className="comments">
+              <ul className='comments'>
                 {photo.comments.map((comment) => (
-                  <li key={comment._id} className="comment">
+                  <li key={comment._id} className='comment'>
                     <p>
                       <strong>Comment Date/Time: </strong>
                       {comment.date_time}
                     </p>
                     <p>
-                      <strong>Comment by: </strong>{" "}
+                      <strong>Comment by: </strong>{' '}
                       <Link to={`/users/${comment.user._id}`}>
                         {`${comment.user.first_name} ${comment.user.last_name}`}
                       </Link>
@@ -220,51 +222,50 @@ function UserPhotos(props) {
                 ))}
               </ul>
             ) : (
-              <Typography variant="body2">
+              <Typography variant='body2'>
                 No comments for this photo
               </Typography>
             )}
-            <div>
-              <TextField
-                label="Add a comment"
-                onChange={handleCommentChange}
-                multiline
-                rows={4}
-                variant="outlined"
-                fullWidth
-                id={`commentBox${photo._id}`}
-                key={photo._id}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  handleCommentSubmit(photo._id);
-                }}
-                disabled={!newComment.trim()}
-              >
-                Submit
-              </Button>
-            </div>
+			<div>
+				<TextField
+					label="Add a comment"
+					onChange={handleCommentChange}
+					multiline
+					rows={4}
+					variant="outlined"
+					fullWidth
+					id={`commentBox${photo._id}`}
+					key={photo._id}
+				/>
+				<Button
+					variant="contained"
+					color="primary"
+					onClick={()=>{handleCommentSubmit(photo._id);}}
+					disabled={!newComment.trim()}
+				>
+				Submit
+				</Button>
+			</div>
           </div>
         ))
       )}
-      {props.AppState.active_user._id === userId ? (
-        <div className="add-photos">
-          <form action="" onSubmit={handleUploadButtonClicked}>
-            <input
-              type="file"
-              accept="image/*"
-              ref={(domFileRef) => {
-                uploadInput = domFileRef;
-              }}
-            />
-            <input value="Submit Photo" type="submit" id="submit-photo-btn" />
-          </form>
-        </div>
-      ) : (
-        <div></div>
-      )}
+	  { (props.AppState.active_user._id === userId) ?
+	  (
+      <div className='add-photos'>
+        <form action='' onSubmit={handleUploadButtonClicked}>
+          <input
+            type='file'
+            accept='image/*'
+            ref={(domFileRef) => {
+              uploadInput = domFileRef;
+            }}
+          />
+          <input value='Submit Photo' type='submit' id='submit-photo-btn' />
+        </form>
+      </div>
+  	  )
+	  :
+	  <div></div>}
     </div>
   );
 }
