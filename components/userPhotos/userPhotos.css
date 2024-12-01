@@ -56,3 +56,12 @@
 .comment-text {
   margin-top: 5px;
 }
+
+.user-photos-creation-favorite {
+  display: flex;
+  justify-content: space-between;
+}
+.user-photos-creation-favorite button {
+  padding: 6px 16px;
+  margin: auto 0;
+}

@@ -418,6 +418,91 @@ app.post("/commentsOfPhoto/:photo_id", function (request, response) {
   });
 });
 
+// returns array of objects, each with _id, file_name and date_time
+app.get(`/getFavorites`, function (request, response) {
+  if (!request.session.user_id) return response.status(401).send();
+
+  const user_id = request.session.user_id || "";
+  const userObjectId = new mongoose.Types.ObjectId(user_id);
+
+  User.findOne({ _id: userObjectId }, function (err, user) {
+    if (err) {
+      response.status(400).send("invalid user id");
+      return;
+    }
+    let favorites = user.favorites;
+    let favoritesToReturn = [];
+    async.each(
+      favorites,
+      (photo_id, callback) => {
+        Photo.findOne({ _id: photo_id }, function (err, photo) {
+          if (err) {
+            response.status(200).send("photo id not recognized");
+            return;
+          }
+          favoritesToReturn.push({
+            file_name: photo.file_name,
+            date_time: photo.date_time,
+            _id: photo._id,
+          });
+          callback();
+        });
+      },
+      function (err) {
+        if (err) {
+          response.status(400).send("was not able to retrieve all favorites");
+          return;
+        }
+        response.status(200).send(favoritesToReturn);
+      }
+    );
+  });
+});
+
+// To add photo to favorites
+app.post(`/addToFavorites`, function (request, response) {
+  if (!request.session.user_id) return response.status(401).send();
+
+  const user_id = request.session.user_id || "";
+  let photo_id = request.body.photo_id;
+
+  const userObjectId = new mongoose.Types.ObjectId(user_id);
+  const photoObjectId = new mongoose.Types.ObjectId(photo_id);
+
+  User.findOne({ _id: userObjectId }, function (err, user) {
+    if (err) {
+      response.status(400).send("invalid user id");
+      return;
+    }
+    if (!user.favorites.includes(photoObjectId)) {
+      //in case it was already favorited?
+      user.favorites.push(photoObjectId);
+      user.save();
+    }
+    response.status(200).send();
+  });
+});
+
+// To remove photo from favorites
+app.get("/deleteFavorite/:photo_id", function (request, response) {
+  if (!request.session.user_id) return response.status(401).send();
+
+  let photo_id = request.params.photo_id;
+  const user_id = request.session.user_id || "";
+  const userObjectId = new mongoose.Types.ObjectId(user_id);
+
+  User.findOne({ _id: userObjectId }, function (err, user) {
+    if (err) {
+      response.status(400).send("invalid user id");
+      return;
+    }
+    const index = user.favorites.indexOf(photo_id);
+    user.favorites.splice(index, 1);
+    user.save();
+    response.status(200).send();
+  });
+});
+
 const server = app.listen(3000, function () {
   const port = server.address().port;
   console.log(

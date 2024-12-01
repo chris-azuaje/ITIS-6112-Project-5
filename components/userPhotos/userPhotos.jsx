@@ -14,6 +14,7 @@ function UserPhotos(props) {
   const history = useHistory();
   const [reload, setReload] = useState();
   const [newComment, setNewComment] = useState('');
+  const [favoritePhotos, setFavoritePhotos] = useState([]);
 
   let uploadInput = '';
   let handleUploadButtonClicked = (e) => {
@@ -47,8 +48,30 @@ function UserPhotos(props) {
       .catch((error) => {
         console.error('Error fetching user photos:', error);
       });
+
+    axios
+    .get(`/getFavorites`)
+    .then((response) => {
+      console.log("Received Favorites:", response.data);
+      const favorite_ids = response.data.map((photo) => photo._id);
+      console.log("favorite_ids:", favorite_ids);
+      setFavoritePhotos(favorite_ids);
+    })
+    .catch((err) => {
+      console.error("Error fetching favorites:", err.response || err.message);
+    });
   }, [userId, photoIndex, reload]);
 
+  const handleFavorite = (id) => {
+    axios
+      .post(`/addToFavorites`, { photo_id: id })
+      .then(() => {
+        setReload((preload) => !preload);
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+  };
 
   const handleCommentChange = (event) => {
     setNewComment(event.target.value);
@@ -191,10 +214,23 @@ function UserPhotos(props) {
             }`}
           >
             <img src={`/images/${photo.file_name}`} alt={photo.file_name} />
-            <p>
-              <strong>Creation Date/Time: </strong>
-              {photo.date_time}
-            </p>
+            <div>
+              <div className="user-photos-creation-favorite">
+                <div>
+                  <strong>Creation Date/Time: </strong>
+                  {photo.date_time}
+                </div>
+                <div>
+                  {favoritePhotos.includes(photo._id) ? (
+                    <button disabled>Added to favorites</button>
+                  ) : (
+                    <button onClick={() => handleFavorite(photo._id)}>
+                      Add to favorites
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Comments in non-advanced view */}
             <Typography variant='h3' className='user-photos-comment-header'>

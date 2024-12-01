@@ -14,6 +14,7 @@ import UserDetail from './components/userDetail/userDetail';
 import UserList from './components/userList/userList';
 import UserPhotos from './components/userPhotos/userPhotos';
 import LoginRegister from './components/loginRegister/loginRegister';
+import Favorites from './components/favorites/favorites';
 
 class PhotoShare extends React.Component {
   constructor(props) {
@@ -58,6 +59,7 @@ class PhotoShare extends React.Component {
 					:
 					<Redirect exact path="/" to="/login-register"/>
 				}
+        
 				{
 					this.state.isLoggedIn ?
 					(
@@ -77,6 +79,14 @@ class PhotoShare extends React.Component {
 					:
 					<Redirect path="/photos/:userId" to="/login-register"/>
 				}
+        
+        {this.state.isLoggedIn ? (
+          <Route
+            path="/favorites"
+            render={(props) => <Favorites {...props} />}
+          />
+          ) : <Redirect path="/favorites" to="/login-register" />
+        }
 
 				{
 					this.state.isLoggedIn ?
