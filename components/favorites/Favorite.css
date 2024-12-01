@@ -1,0 +1,25 @@
+.modal-image {
+  width: 100%;
+  padding: 10px;
+}
+
+#card-fav-header {
+  height: 20px;
+}
+
+.cardMedia {
+  cursor: pointer;
+}
+
+#card-fav {
+  height: 230px;
+  width: 300px;
+}
+
+.favoritesPhotoContainer {
+  display: flex;
+  gap: 20px;
+  justify-content: space-evenly;
+  width: 100%;
+  flex-wrap: wrap;
+}
