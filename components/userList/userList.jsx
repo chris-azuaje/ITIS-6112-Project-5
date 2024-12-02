@@ -12,6 +12,7 @@ import {
 import { Link } from 'react-router-dom';
 import './userList.css';
 import axios from 'axios';
+import Sidebar from './sidebar';
 
 /**
  * Define UserList, a React component of project #5
@@ -69,6 +70,7 @@ class UserList extends React.Component {
               <Divider />
             </div>
           ))}
+          <Sidebar/>
         </List>
       </div>
     );
