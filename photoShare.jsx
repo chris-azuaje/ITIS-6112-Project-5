@@ -79,14 +79,13 @@ class PhotoShare extends React.Component {
 					:
 					<Redirect path="/photos/:userId" to="/login-register"/>
 				}
-        
-        {this.state.isLoggedIn ? (
-          <Route
-            path="/favorites"
-            render={(props) => <Favorites {...props} />}
-          />
-          ) : <Redirect path="/favorites" to="/login-register" />
-        }
+				
+				{
+					this.state.isLoggedIn ?
+					<Route path="/favorites" render={ props => <Favorites {...props}/> } />
+					:
+					<Redirect path="/users" to="/login-register"/>
+				}
 
 				{
 					this.state.isLoggedIn ?

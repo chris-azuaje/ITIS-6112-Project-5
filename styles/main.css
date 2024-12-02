@@ -10,6 +10,6 @@ main- here.
 }
 
 .main-grid-item {
-  height: calc(100vh - 85px);
+  /* height: calc(100vh - 85px); */
   padding: 10px;
 }
