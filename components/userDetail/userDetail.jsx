@@ -12,6 +12,8 @@ class UserDetail extends React.Component {
       user: {},
     };
 
+	this.handleDeleteAccount = this.handleDeleteAccount.bind(this);
+
     this.getUserDetails();
   }
 
@@ -40,7 +42,8 @@ class UserDetail extends React.Component {
         res.status = 200;
         // <Alert severity="success">This is a success Alert.</Alert>;
         // Redirect to the login or home page
-        window.location.href = '/login';
+        // window.location.href = '/photo-share.html#/login-register';
+		this.props.SetUser({}, false);
       })
       .catch((err) => {
         console.error('Error deleting account:', err);
@@ -81,7 +84,7 @@ class UserDetail extends React.Component {
         <Button
           variant='contained'
           color='primary'
-          onClick={this.handleViewPhotosClick}
+          onClick={()=>this.handleViewPhotosClick()}
         >
           View Photos
         </Button>
