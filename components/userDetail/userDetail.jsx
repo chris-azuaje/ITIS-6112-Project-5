@@ -33,6 +33,21 @@ class UserDetail extends React.Component {
     );
   }
 
+  handleDeleteAccount() {
+    axios
+      .delete(`/user/${this.props.match.params.userId}`)
+      .then((res) => {
+        res.status = 200;
+        // <Alert severity="success">This is a success Alert.</Alert>;
+        // Redirect to the login or home page
+        window.location.href = '/login';
+      })
+      .catch((err) => {
+        console.error('Error deleting account:', err);
+        // <Alert severity="error">This is an error Alert.</Alert>;
+      });
+  }
+
   render() {
     return this.state.user.length === 0 ? (
       <p>Loading user details</p>
@@ -70,6 +85,16 @@ class UserDetail extends React.Component {
         >
           View Photos
         </Button>
+        {this.state.user._id === `${this.props.AppState.active_user._id}` ? (
+          <Button
+            variant='outlined'
+            color='error'
+            size='small'
+            onClick={this.handleDeleteAccount}
+          >
+            Delete Account
+          </Button>
+        ) : null}
       </div>
     );
   }

@@ -458,7 +458,6 @@ app.delete('/photos/:photoId/comments/:commentId', async (req, res) => {
   }
 });
 
-/*
 // ---------- Handle Account Delete ----------
 app.delete('/user/:id', async (req, res) => {
   const userId = req.params.id;
@@ -497,7 +496,6 @@ app.delete('/user/:id', async (req, res) => {
     res.status(500).send({ message: 'Failed to delete user' });
   }
 });
-*/
 
 const server = app.listen(3000, function () {
   const port = server.address().port;

@@ -56,7 +56,11 @@ class PhotoShare extends React.Component {
                     <Route
                       path='/users/:userId'
                       render={(props) => (
-                        <UserDetail {...props} key={Math.random()} />
+                        <UserDetail
+                          AppState={this.state}
+                          {...props}
+                          key={Math.random()}
+                        />
                       )}
                     />
                   ) : (
