@@ -51,6 +51,7 @@ const processFormBody = multer({ storage: multer.memoryStorage() }).single(
 const User = require("./schema/user.js");
 const Photo = require("./schema/photo.js");
 const SchemaInfo = require("./schema/schemaInfo.js");
+const Activity = require("./schema/activity.js");
 
 // this line for tests and before submission!
 mongoose.set("strictQuery", false);
@@ -278,6 +279,19 @@ app.post("/user", function (request, response) {
           .then((user) => {
             request.session.user_id = user._id;
             session.user_id = user._id;
+
+            Activity.create({
+              userId: user._id,
+              description: `User ${user.first_name} added`,
+            })
+              .then((user1) => {
+                console.log(`Added User` + user1);
+              })
+              .catch((err1) => {
+                console.error("Error: ", err1);
+                response.status(500).send();
+              });
+              
             response.end(JSON.stringify(user));
           })
           .catch((error) => {
@@ -303,6 +317,19 @@ app.post("/admin/login", function (request, response) {
         request.session.user_id = result[0]._id;
         request.session.first_name = result[0].first_name;
         request.session.last_name = result[0].last_name;
+
+        Activity.create({
+          userId: result[0]._id,
+          description: `User ${result[0].first_name} logged in`,
+        })
+          .then((user8) => {
+            console.log(`User logged in` + user8);
+          })
+          .catch((err1) => {
+            console.error("Error in /user", err1);
+            response.status(500).send();
+          });
+
         response.status(200).send(
           JSON.stringify({
             _id: request.session.user_id,
@@ -311,7 +338,7 @@ app.post("/admin/login", function (request, response) {
           })
         );
       } else {
-        response.status(400).send("Invaid password");
+        response.status(400).send("Invalid password");
       }
     })
     .catch(() => {
@@ -319,13 +346,42 @@ app.post("/admin/login", function (request, response) {
     });
 });
 
-app.post("/admin/logout", function (req, res) {
-  if (req.session.user_id) {
-    req.session.destroy();
-    res.status(200).send();
-  } else {
-    res.status(400).send();
-  }
+app.post("/admin/logout", function (request, response) {
+  // if (req.session.user_id) {
+  //   req.session.destroy();
+  //   res.status(200).send();
+  // } else {
+  //   res.status(400).send();
+  // }
+  User.find(
+    {
+      _id: request.session.user_id,
+    },
+    { __v: 0 },
+    function (err, user) {
+      if (err) {
+        // write your own comments
+        console.error("Error: ", err);
+        return;
+      }
+      Activity.create({
+        userId: user[0]._id,
+        description: `User ${user[0].first_name} logged out`,
+      })
+        .then((user9) => {
+          console.log(`User logged out` + user9);
+        })
+        .catch((err1) => {
+          console.error("Error: ", err1);
+          response.status(500).send();
+        });
+    }
+  );
+
+  request.session.destroy(() => {
+    session.user_id = undefined;
+    response.end();
+  });
 });
 
 // For checking the session if the user is laready logged in. used for page reloads mainly
@@ -363,6 +419,33 @@ app.post("/photos/new", (request, response) => {
         comment: [],
       })
         .then(() => {
+          // activity code
+          User.find(
+            {
+              _id: request.session.user_id,
+            },
+            { __v: 0 },
+            function (err_cur, user) {
+              if (err_cur) {
+                console.error("Error: ", err_cur);
+                return;
+              }
+
+              Activity.create({
+                userId: user[0]._id,
+                description: `User ${user[0].first_name} added photo ${filename}`,
+              })
+                .then((user1) => {
+                  console.log(`User added photo` + user1);
+                })
+                .catch((err1) => {
+                  console.error("Error: ", err1);
+                  response.status(500).send();
+                });
+            }
+          );
+          // response.end();
+
           response.status(200).send();
         })
         .catch(() => {
@@ -413,8 +496,130 @@ app.post("/commentsOfPhoto/:photo_id", function (request, response) {
         console.error("Error saving comment:", saveErr);
         return response.status(500).send("Error saving comment");
       }
+
+      User.find({ _id: userObjectId }, { __v: 0 }, function (err3, user) {
+          if (err3) {
+            console.error("Error: ", err3);
+            return;
+          }
+          console.log("user:", user);
+
+          Activity.create({
+            userId: user[0]._id,
+            description: `User ${user[0].first_name} added comment to photo ${photoObjectId}`,
+          })
+            .then((user6) => {
+              console.log(`User added comment` + user6);
+            })
+            .catch((err1) => {
+              console.error("Error: ", err1);
+              response.status(500).send();
+            });
+        }
+      );
+
       return response.status(200).send("Comment added successfully");
     });
+  });
+});
+
+// returns array of objects, each with _id, file_name and date_time
+app.get(`/getFavorites`, function (request, response) {
+  if (!request.session.user_id) return response.status(401).send();
+
+  const user_id = request.session.user_id || "";
+  const userObjectId = new mongoose.Types.ObjectId(user_id);
+
+  User.findOne({ _id: userObjectId }, function (err, user) {
+    if (err) {
+      response.status(400).send("invalid user id");
+      return;
+    }
+    let favorites = user.favorites;
+    let favoritesToReturn = [];
+    async.each(
+      favorites,
+      (photo_id, callback) => {
+        Photo.findOne({ _id: photo_id }, function (err, photo) {
+          if (err) {
+            response.status(200).send("photo id not recognized");
+            return;
+          }
+          favoritesToReturn.push({
+            file_name: photo.file_name,
+            date_time: photo.date_time,
+            _id: photo._id,
+          });
+          callback();
+        });
+      },
+      function (err) {
+        if (err) {
+          response.status(400).send("was not able to retrieve all favorites");
+          return;
+        }
+        response.status(200).send(favoritesToReturn);
+      }
+    );
+  });
+});
+
+// To add photo to favorites
+app.post(`/addToFavorites`, function (request, response) {
+  if (!request.session.user_id) return response.status(401).send();
+
+  const user_id = request.session.user_id || "";
+  let photo_id = request.body.photo_id;
+
+  const userObjectId = new mongoose.Types.ObjectId(user_id);
+  const photoObjectId = new mongoose.Types.ObjectId(photo_id);
+
+  User.findOne({ _id: userObjectId }, function (err, user) {
+    if (err) {
+      response.status(400).send("invalid user id");
+      return;
+    }
+    if (!user.favorites.includes(photoObjectId)) {
+      //in case it was already favorited?
+      user.favorites.push(photoObjectId);
+      user.save();
+    }
+    response.status(200).send();
+  });
+});
+
+// To remove photo from favorites
+app.get("/deleteFavorite/:photo_id", function (request, response) {
+  if (!request.session.user_id) return response.status(401).send();
+
+  let photo_id = request.params.photo_id;
+  const user_id = request.session.user_id || "";
+  const userObjectId = new mongoose.Types.ObjectId(user_id);
+
+  User.findOne({ _id: userObjectId }, function (err, user) {
+    if (err) {
+      response.status(400).send("invalid user id");
+      return;
+    }
+    const index = user.favorites.indexOf(photo_id);
+    user.favorites.splice(index, 1);
+    user.save();
+    response.status(200).send();
+  });
+});
+
+// get acivity list
+app.get("/activityList", (request, response) => {
+  Activity.find({}, function (err, activityDetails) {
+    if (err) {
+      console.error("Error:", err);
+      response.status(500).send(JSON.stringify(err));
+    } else if (activityDetails.length === 0) {
+      response.status(400).send("Missing activity list");
+    } else {
+      response.json(activityDetails);
+      response.end();
+    }
   });
 });
 

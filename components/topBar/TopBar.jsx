@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { AppBar, Toolbar, Typography, Box } from '@mui/material';
-import { withRouter, useLocation } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
+import { withRouter, useLocation, Link } from 'react-router-dom';
 // import FetchModel from '../../lib/fetchModelData';
 import axios from 'axios';
 
@@ -52,20 +52,26 @@ function TopBar(props) {
   return (
     <AppBar className='topbar-appBar' position='absolute'>
       <Toolbar style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant='h5' color='inherit'>
-          G3
-        </Typography>
+      <Link
+          to="/photo-share.html"
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <Typography variant="h5" color="inherit">
+            G3
+          </Typography>
+        </Link>
 		<Typography variant="h5" color='inherit'>
 			{props.AppState.isLoggedIn ?
 				`Hi ${props.AppState.active_user.first_name}` :
 				`Please Login`}
 		</Typography>
         <Typography variant='h5' color='inherit'>
-          {userId
-            ? `Details of ${name.f} ${name.l}`
-            : photo
-            ? `Photos of ${name.f} ${name.l}`
-            : ''}
+        {location.pathname.includes("users") &&
+            `Details of ${name.f} ${name.l}`}
+          {location.pathname.includes("photos") &&
+            `Photos of ${name.f} ${name.l}`}
+          {location.pathname.includes("favorites") &&
+            `Favorites of ${name.f} ${name.l}`}
         </Typography>
 		<Box sx={{
 			display: 'flex',
@@ -75,6 +81,17 @@ function TopBar(props) {
 			<Typography variant='body2' color='inherit' mx={2}>
 				Version: {version}
 			</Typography>
+      <Link
+            to="/favorites"
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
+            <Button variant="contained" sx={{ mt: 3, mb: 2, mx: 2 }}>
+              Favorites
+            </Button>
+          </Link>
 			<LogoutButton {...props}/>
 		</Box>
       </Toolbar>
