@@ -6,6 +6,7 @@ import './userPhotos.css'; // Change this if you create a specific CSS for user 
 import axios from 'axios';
 
 function UserPhotos(props) {
+  console.log("props:", props);
   const { userId, photoIndex } = useParams();
   const [photos, setPhotos] = useState([]);
   const [, setAdvancedFeaturesEnabled] = useState(false);
@@ -14,6 +15,7 @@ function UserPhotos(props) {
   const history = useHistory();
   const [reload, setReload] = useState();
   const [newComment, setNewComment] = useState('');
+  const [favoritePhotos, setFavoritePhotos] = useState([]);
 
   let uploadInput = '';
   let handleUploadButtonClicked = (e) => {
@@ -26,6 +28,7 @@ function UserPhotos(props) {
       axios
         .post('/photos/new', domForm)
         .then(() => {
+          props.toggleSidebarReload();
           setReload((preload) => !preload);
         })
         .catch((err) => console.log(`POST ERR: ${err}`));
@@ -47,7 +50,41 @@ function UserPhotos(props) {
       .catch((error) => {
         console.error('Error fetching user photos:', error);
       });
+
+    axios
+    .get(`/getFavorites`)
+    .then((response) => {
+      console.log("Received Favorites:", response.data);
+      const favorite_ids = response.data.map((photo) => photo._id);
+      console.log("favorite_ids:", favorite_ids);
+      setFavoritePhotos(favorite_ids);
+    })
+    .catch((err) => {
+      console.error("Error fetching favorites:", err.response || err.message);
+    });
   }, [userId, photoIndex, reload]);
+
+  const handleFavorite = (id) => {
+    axios
+      .post(`/addToFavorites`, { photo_id: id })
+      .then(() => {
+        setReload((preload) => !preload);
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+  };
+
+  const handleDeleteFavorite = (id) => {
+    axios
+      .get(`/deleteFavorite/${id}`)
+      .then(() => {
+        setReload((preload) => !preload);
+      })
+      .catch((err) => {
+        console.log(err.response);
+      });
+  };
 
   const handleCommentChange = (event) => {
     setNewComment(event.target.value);
@@ -60,6 +97,7 @@ function UserPhotos(props) {
         userId: userId,
       })
       .then(() => {
+        props.toggleSidebarReload();
         setNewComment('');
         document.getElementById(`commentBox${id}`).value = '';
         setReload((preload) => !preload);
@@ -226,12 +264,10 @@ function UserPhotos(props) {
                       variant='outlined'
                       color='error'
                       size='small'
-                      onClick={() =>
-                        handleDeleteComment(
+                      onClick={() => handleDeleteComment(
                           photos[currentPhotoIndex]._id,
                           comment._id
-                        )
-                      }
+                        )}
                     >
                       Delete comment
                     </Button>
@@ -267,6 +303,25 @@ function UserPhotos(props) {
                 Delete photo
               </Button>
             ) : null}
+            <div>
+              <div className="user-photos-creation-favorite">
+                <div>
+                  <strong>Creation Date/Time: </strong>
+                  {photo.date_time}
+                </div>
+                <div>
+                  {favoritePhotos.includes(photo._id) ? (
+                    <Button variant="contained" size="small" onClick={() => handleDeleteFavorite(photo._id)}>
+                      Remove from favorites
+                    </Button>
+                  ) : (
+                    <Button variant="contained" size="small" onClick={() => handleFavorite(photo._id)}>
+                      Add to favorites
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
 
             {/* Comments in non-advanced view */}
             <Typography variant='h3' className='user-photos-comment-header'>
@@ -296,9 +351,7 @@ function UserPhotos(props) {
                         variant='outlined'
                         color='error'
                         size='small'
-                        onClick={() =>
-                          handleDeleteComment(photo._id, comment._id)
-                        }
+                        onClick={() => handleDeleteComment(photo._id, comment._id)}
                       >
                         Delete comment
                       </Button>

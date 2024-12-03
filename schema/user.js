@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   description: String,
   occupation: String,
   login_name: String,
+  favorites: [mongoose.Schema.Types.ObjectId],
   password: String,
 });
 
