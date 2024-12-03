@@ -59,7 +59,7 @@ function TopBar(props) {
           <Typography variant="h5" color="inherit">
             G3
           </Typography>
-        </Link>
+      </Link>
 		<Typography variant="h5" color='inherit'>
 			{props.AppState.isLoggedIn ?
 				`Hi ${props.AppState.active_user.first_name}` :
@@ -91,7 +91,7 @@ function TopBar(props) {
             <Button variant="contained" sx={{ mt: 3, mb: 2, mx: 2 }}>
               Favorites
             </Button>
-          </Link>
+      </Link>
 			<LogoutButton {...props}/>
 		</Box>
       </Toolbar>

@@ -6,6 +6,7 @@ import './userPhotos.css'; // Change this if you create a specific CSS for user 
 import axios from 'axios';
 
 function UserPhotos(props) {
+  console.log("props:", props);
   const { userId, photoIndex } = useParams();
   const [photos, setPhotos] = useState([]);
   const [, setAdvancedFeaturesEnabled] = useState(false);
@@ -27,6 +28,7 @@ function UserPhotos(props) {
       axios
         .post('/photos/new', domForm)
         .then(() => {
+          props.toggleSidebarReload();
           setReload((preload) => !preload);
         })
         .catch((err) => console.log(`POST ERR: ${err}`));
@@ -95,6 +97,7 @@ function UserPhotos(props) {
         userId: userId,
       })
       .then(() => {
+        props.toggleSidebarReload();
         setNewComment('');
 		document.getElementById(`commentBox${id}`).value = '';
         setReload(preload => !preload);
