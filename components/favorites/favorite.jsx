@@ -46,9 +46,11 @@ class Favorite extends React.Component {
           <CardHeader
             id="card-fav-header"
             action={
-              <Button variant="contained" size="small" onClick={(event) => this.handleDeleteFavorite(event)}>
-                Remove from favorites
-              </Button>
+              (
+							<Button variant="contained" size="small" onClick={(event) => this.handleDeleteFavorite(event)}>
+								Remove from favorites
+							</Button>
+							)
             }
           />
           <CardMedia

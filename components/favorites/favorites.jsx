@@ -1,7 +1,7 @@
 import React from "react";
-import { Typography, Grid, Divider } from "@mui/material";
-import Favorite from "./favorite";
+import { Typography, Grid } from "@mui/material";
 import axios from "axios";
+import Favorite from "./favorite";
 
 /**
  * Define Favorites

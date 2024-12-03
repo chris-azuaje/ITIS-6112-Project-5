@@ -38,7 +38,7 @@ const fs = require('fs');
 const async = require('async');
 
 const express = require('express');
-const router = express.Router();
+// const router = express.Router();
 const app = express();
 
 const session = require('express-session');
@@ -380,6 +380,7 @@ app.post("/admin/logout", function (request, response) {
 });
 
 // For checking the session if the user is laready logged in. used for page reloads mainly
+/* eslint consistent-return: 0 */
 app.post('/admin/session/resume', function (req, res) {
   if (req.session.user_id) {
     res.status(200).send(
@@ -397,7 +398,6 @@ app.post('/admin/session/resume', function (req, res) {
 app.post('/photos/new', (request, response) => {
   processFormBody(request, response, function (err) {
     if (err || !request.file) {
-      // XXX -  Insert error handling code here.
       response.send(400).send();
       return;
     }
@@ -405,8 +405,6 @@ app.post('/photos/new', (request, response) => {
     const filename = 'U' + String(timestamp) + request.file.originalname;
 
     fs.writeFile('./images/' + filename, request.file.buffer, function () {
-      // XXX - Once you have the file written into your images directory under the
-      // name filename you can create the Photo object in the database
       Photo.create({
         file_name: filename,
         date_time: timestamp,
