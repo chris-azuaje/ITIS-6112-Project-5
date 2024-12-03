@@ -521,7 +521,6 @@ app.post('/commentsOfPhoto/:photo_id', function (request, response) {
 });
 
 // ---------- Handle Photo Delete ----------
-
 app.delete('/photos/:photoId', async (req, res) => {
   const { photoId } = req.params;
 
@@ -530,11 +529,26 @@ app.delete('/photos/:photoId', async (req, res) => {
     if (!photo) {
       return res.status(404).send({ message: 'Photo not found.' });
     }
+
+	User.updateMany(
+		{ favorites: photoId },
+		{ $pull: { favorites: photoId } },
+		{ multi: true },
+		(err, result) => {
+			if (err) {
+				console.error('Error removing favorite from users:', err);
+			} else {
+				console.log('Number of documents updated:', result.nModified);
+			}
+		}
+	);
+
     res.send({ message: 'Photo deleted successfully.', photo });
   } catch (err) {
     console.error('Error deleting photo:', err);
     res.status(500).send({ message: 'Failed to delete photo.' });
   }
+
 });
 
 // ---------- Handle Comment Delete ----------
@@ -570,6 +584,29 @@ app.delete('/user/:id', async (req, res) => {
   if (!req.session.user_id || req.session.user_id !== userId) {
     return res.status(401).send({ message: 'Unauthorized' });
   }
+
+	Photo.find({user_id:userId}, "_id").lean()
+	.then(result => {
+		let ids = [];
+		result.forEach(i => {
+			ids.push(i._id.toString());
+		});
+
+		User.updateMany(
+      { favorites: { $in: ids } },
+      { $pull: { favorites: { $in: ids } } }
+    )
+		.then(result2 => {
+			console.log(result2);
+		})
+		.catch(error2 => {
+			console.log(error2);
+		});
+
+	})
+	.catch(error => {
+		console.log(error);
+	});
 
   try {
     // Delete user details

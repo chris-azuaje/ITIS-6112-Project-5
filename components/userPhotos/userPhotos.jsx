@@ -189,16 +189,6 @@ function UserPhotos(props) {
           <Button variant='contained' color='primary' onClick={handleGoBack}>
             Go back to user details
           </Button>
-          {props.AppState.active_user._id === userId ? (
-            <Button
-              variant='outlined'
-              color='error'
-              size='small'
-              // onClick={handleDeleteAccount}
-            >
-              Delete Account
-            </Button>
-          ) : null}
         </div>
       </div>
       {/* Advanced features check box and buttons */}
@@ -289,10 +279,10 @@ function UserPhotos(props) {
             }`}
           >
             <img src={`/images/${photo.file_name}`} alt={photo.file_name} />
-            <p>
-              <strong>Creation Date/Time: </strong>
-              {photo.date_time}
-            </p>
+						<div>
+							<strong>Creation Date/Time: </strong>
+							{photo.date_time}
+						</div>
             {props.AppState.active_user._id === userId ? (
               <Button
                 variant='outlined'
@@ -305,10 +295,6 @@ function UserPhotos(props) {
             ) : null}
             <div>
               <div className="user-photos-creation-favorite">
-                <div>
-                  <strong>Creation Date/Time: </strong>
-                  {photo.date_time}
-                </div>
                 <div>
                   {favoritePhotos.includes(photo._id) ? (
                     <Button variant="contained" size="small" onClick={() => handleDeleteFavorite(photo._id)}>

@@ -47,7 +47,7 @@ class PhotoShare extends React.Component {
             <div className="main-topbar-buffer" />
             <Grid item sm={3}>
               <Paper className="main-grid-item">
-                <UserList key={this.state.reloadSidebar ? Math.random() : 'static'} reloadSidebar={this.state.reloadSidebar} />
+                <UserList key={Math.random()} reloadSidebar={this.state.reloadSidebar} />
               </Paper>
             </Grid>
             <Grid item sm={9}>
@@ -84,7 +84,7 @@ class PhotoShare extends React.Component {
                     this.state.isLoggedIn ?
                       <Route path="/favorites" render={props => <Favorites {...props} />} />
                       :
-                      <Redirect path="/users" to="/login-register" />
+                      <Redirect path="/favorites" to="/login-register" />
                   }
 
                   {
