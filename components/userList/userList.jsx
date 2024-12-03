@@ -18,7 +18,7 @@ import Sidebar from './sidebar';
 /**
  * Define UserList, a React component of project #5
  */
-function UserList() {
+function UserList({reloadSidebar}) {
   const [users, setUsers] = useState([]);
   const [expandedUser, setExpandedUser] = useState("");
   const [mustLogin, setMustLogin] = useState(false);
@@ -73,7 +73,7 @@ function UserList() {
               </Button>
             </ListItem>
 
-            {expandedUser === user._id && <Sidebar user={user} />}
+            {expandedUser === user._id && <Sidebar user={user} reloadSidebar={reloadSidebar} />}
 
             <Divider />
           </div>

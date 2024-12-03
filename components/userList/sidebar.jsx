@@ -8,19 +8,31 @@ class Sidebar extends React.Component {
 
         this.state = {
             activityList: '',
-          };
-        
+          };   
     }
+    
     componentDidMount() {
-      
+        this.fetchActivityList();
+    }
 
-        axios.get('/activityList').then((result)=>{
-            this.setState({
-                activityList: result.data
+    componentDidUpdate(prevProps) {
+        if (prevProps.reloadSidebar !== this.props.reloadSidebar) {
+            this.fetchActivityList();
+        }
+    }
+
+    fetchActivityList() {
+        axios.get('/activityList')
+            .then((result) => {
+                this.setState({
+                    activityList: result.data,
+                });
+
+                console.log(this.state.activityList);
+            })
+            .catch(err => {
+                console.log(err);
             });
-
-            console.log(this.state.activityList);
-        }).catch(err=>{console.log(err);});
     }
     
     render() {
