@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ListItemAvatar,
   Avatar,
@@ -7,6 +7,7 @@ import {
   ListItem,
   ListItemText,
   Typography,
+  Button
   // Typography,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -17,64 +18,69 @@ import Sidebar from './sidebar';
 /**
  * Define UserList, a React component of project #5
  */
-class UserList extends React.Component {
-  constructor(props) {
-    super(props);
+function UserList() {
+  const [users, setUsers] = useState([]);
+  const [expandedUser, setExpandedUser] = useState("");
+  const [mustLogin, setMustLogin] = useState(false);
 
-    this.state = {
-      users: [],
-      mustLogin: false,
-    };
-
-    this.getUsers();
-  }
-
-  getUsers() {
+  useEffect(() => {
     axios.get(`/user/list`).then(
       (data) => {
-        this.setState({ users: data.data });
+        setUsers(data.data);
       },
       (err) => {
         console.log(`Status Code UL: ${err.response.status}`);
-        this.setState({ mustLogin: true });
+        setMustLogin(true);
       }
     );
-  }
+  }, []);
 
-  render() {
-    return this.state.mustLogin ? (
-      <Typography variant='h5'>Please Login to View Users</Typography>
-    ) : this.state.users.length === 0 ? (
-      <p>Loading Users</p>
-    ) : (
-      <div>
-        <List component='nav'>
-          {this.state.users.map((user) => (
-            <div key={user._id}>
-              <ListItem>
-                <ListItemAvatar>
-                  <Avatar alt={`${user.first_name}`} src='#' />
-                </ListItemAvatar>
-                <ListItemText
-                  primary={
-                    (
-					<Link to={`/users/${user._id}`}>
-                      {user.first_name} {user.last_name}
-					</Link>
-					)
-                  }
-                  key={user._id}
-                  className='listItemText'
-                />
-              </ListItem>
-              <Divider />
-            </div>
-          ))}
-          <Sidebar/>
-        </List>
-      </div>
-    );
-  }
+  const handleToggleSidebar = (userId) => {
+    if (expandedUser === userId) {
+      setExpandedUser(null);
+    } else {
+      setExpandedUser(userId);
+    }
+  };
+
+  return mustLogin ? (
+    <Typography variant="h5">Please Login to View Users</Typography>
+  ) : users.length === 0 ? (
+    <p>Loading Users</p>
+  ) : (
+    <div>
+      <List component="nav">
+        {users.map((user) => (
+          <div key={user._id}>
+            <ListItem>
+              <ListItemAvatar>
+                <Avatar alt={`${user.first_name}`} src="#" />
+              </ListItemAvatar>
+              <ListItemText
+                primary={(
+                  <Link to={`/users/${user._id}`}>
+                    {user.first_name} {user.last_name}
+                  </Link>
+                )}
+                className="listItemText"
+              />
+              <Button onClick={() => handleToggleSidebar(user._id)}>
+                {expandedUser === user._id ? (
+                  <p>▲</p>
+                ) : (
+                  <p>▼</p>
+                )}
+              </Button>
+            </ListItem>
+
+            {expandedUser === user._id && <Sidebar user={user} />}
+
+            <Divider />
+          </div>
+        ))}
+      </List>
+    </div>
+  );
 }
 
 export default UserList;

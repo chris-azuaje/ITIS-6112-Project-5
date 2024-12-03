@@ -281,7 +281,7 @@ app.post("/user", function (request, response) {
             session.user_id = user._id;
 
             Activity.create({
-              userId: user._id,
+              user_id: request.session.user_id,
               description: `User ${user.first_name} added`,
             })
               .then((user1) => {
@@ -319,7 +319,7 @@ app.post("/admin/login", function (request, response) {
         request.session.last_name = result[0].last_name;
 
         Activity.create({
-          userId: result[0]._id,
+          user_id: result[0]._id,
           description: `User ${result[0].first_name} logged in`,
         })
           .then((user8) => {
@@ -347,12 +347,6 @@ app.post("/admin/login", function (request, response) {
 });
 
 app.post("/admin/logout", function (request, response) {
-  // if (req.session.user_id) {
-  //   req.session.destroy();
-  //   res.status(200).send();
-  // } else {
-  //   res.status(400).send();
-  // }
   User.find(
     {
       _id: request.session.user_id,
@@ -365,7 +359,7 @@ app.post("/admin/logout", function (request, response) {
         return;
       }
       Activity.create({
-        userId: user[0]._id,
+        user_id: user[0]._id,
         description: `User ${user[0].first_name} logged out`,
       })
         .then((user9) => {
@@ -432,7 +426,7 @@ app.post("/photos/new", (request, response) => {
               }
 
               Activity.create({
-                userId: user[0]._id,
+                user_id: user[0]._id,
                 description: `User ${user[0].first_name} added photo ${filename}`,
               })
                 .then((user1) => {
@@ -505,7 +499,7 @@ app.post("/commentsOfPhoto/:photo_id", function (request, response) {
           console.log("user:", user);
 
           Activity.create({
-            userId: user[0]._id,
+            user_id: user[0]._id,
             description: `User ${user[0].first_name} added comment to photo ${photoObjectId}`,
           })
             .then((user6) => {

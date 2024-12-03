@@ -12,6 +12,8 @@ class Sidebar extends React.Component {
         
     }
     componentDidMount() {
+      
+
         axios.get('/activityList').then((result)=>{
             this.setState({
                 activityList: result.data
@@ -20,43 +22,61 @@ class Sidebar extends React.Component {
             console.log(this.state.activityList);
         }).catch(err=>{console.log(err);});
     }
+    
     render() {
+      const {user} = this.props;
+      const activityList = Array.isArray(this.state.activityList)
+      ? this.state.activityList.reduce((acc, activity) => {
+          const { user_id, description } = activity;
 
-    return this.state.activityList ? 
-    (
-      <div>
-        {this.state.activityList.map((activity) => {
-          if (activity.description.includes("added photo")) {
-            const match = activity.description.match(/added photo (.+)/);
-            
-            if (match && match[1]) {
-              const photoFileName = match[1];
-
-              return (
-                <ul key={activity.description}>
-                  <li>
-                    {activity.description}
-                    <br />
-                    <img
-                      src={`/images/${photoFileName}`}
-                      alt={photoFileName}
-                      className='img-thumbnail'
-                    />
-                  </li>
-                </ul>
-              );
-            }
+          if (acc[user_id]) {
+            acc[user_id].push(description);
+          } else {
+            acc[user_id] = [description];
           }
 
-          return (
-            <ul key={activity.description}>
-              <li>{activity.description}</li>
-            </ul>
-          );
-        })}
-      </div>
-     ) : ( <div>Nothing to render</div>);
-    }
-}
+          return acc;
+        }, {})
+      : {};
 
+      const userActivities = activityList[user._id] || [];
+
+      return userActivities.length > 0 ? (
+        <div>
+          {userActivities.map((description, index) => {
+            if (description.includes('added photo')) {
+              const match = description.match(/added photo (.+)/);
+  
+              if (match && match[1]) {
+                const photoFileName = match[1];
+  
+                return (
+                  <ul key={index}>
+                    <li>
+                      {description}
+                      <br />
+                      <img
+                        src={`/images/${photoFileName}`}
+                        alt={photoFileName}
+                        className="img-thumbnail"
+                      />
+                    </li>
+                  </ul>
+                );
+              }
+            }
+  
+            return (
+              <ul key={index}>
+                <li>{description}</li>
+              </ul>
+            );
+          })}
+        </div>
+      ) : (
+        <div>Nothing to render</div>
+      );
+    }
+  }
+  
 export default Sidebar;

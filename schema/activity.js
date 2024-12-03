@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
  * Create a Mongoose Schema.
  */
 const Activity = new mongoose.Schema({
-    userid: mongoose.Schema.Types.ObjectId,
+    user_id: mongoose.Schema.Types.ObjectId,
     description: String,
 });
 
