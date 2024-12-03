@@ -99,8 +99,8 @@ function UserPhotos(props) {
       .then(() => {
         props.toggleSidebarReload();
         setNewComment('');
-		document.getElementById(`commentBox${id}`).value = '';
-        setReload(preload => !preload);
+        document.getElementById(`commentBox${id}`).value = '';
+        setReload((preload) => !preload);
       })
       .catch((error) => {
         console.error('Error adding comment:', error);
@@ -131,38 +131,65 @@ function UserPhotos(props) {
     }
   };
 
+  // Remove photo
+  const handleDeletePhoto = (photoId) => {
+    axios
+      .delete(`/photos/${photoId}`)
+      .then((response) => {
+        console.log(response.data.message);
+        setReload((preload) => !preload); // Refresh photo list
+      })
+      .catch((error) => {
+        console.error('Error deleting photo:', error);
+      });
+  };
+
+  // Remove comment
+  const handleDeleteComment = (photoId, commentId) => {
+    axios
+      .delete(`/photos/${photoId}/comments/${commentId}`)
+      .then((response) => {
+        console.log(response.data.message);
+        setReload((preload) => !preload); // Refresh comments
+      })
+      .catch((error) => {
+        console.error('Error deleting comment:', error);
+      });
+  };
+
   // If user has no photos, "loading" otherwise display photos and comments
   return photos.length === 0 ? (
-	<div>
-		<p>There are no photos!</p>
-		{ (props.AppState.active_user._id === userId) ?
-		(
-		<div className='add-photos'>
-			<form action='' onSubmit={handleUploadButtonClicked}>
-			<input
-				type='file'
-				accept='image/*'
-				ref={(domFileRef) => {
-				uploadInput = domFileRef;
-				}}
-			/>
-			<input value='Submit Photo' type='submit' id='submit-photo-btn' />
-			</form>
-		</div>
-		)
-		:
-		<div></div>}
-	</div>
-  	) : (
+    <div>
+      <p>There are no photos!</p>
+      {props.AppState.active_user._id === userId ? (
+        <div className='add-photos'>
+          <form action='' onSubmit={handleUploadButtonClicked}>
+            <input
+              type='file'
+              accept='image/*'
+              ref={(domFileRef) => {
+                uploadInput = domFileRef;
+              }}
+            />
+            <input value='Submit Photo' type='submit' id='submit-photo-btn' />
+          </form>
+        </div>
+      ) : (
+        <div></div>
+      )}
+    </div>
+  ) : (
     // Photos header section
     <div className='user-photos-container'>
       <div className='user-photos-header'>
         <Typography variant='h2' sx={{ fontSize: '40px' }}>
           Photos
         </Typography>
-        <Button variant='contained' color='primary' onClick={handleGoBack}>
-          Go back to user details
-        </Button>
+        <div>
+          <Button variant='contained' color='primary' onClick={handleGoBack}>
+            Go back to user details
+          </Button>
+        </div>
       </div>
       {/* Advanced features check box and buttons */}
       <Checkbox
@@ -193,6 +220,16 @@ function UserPhotos(props) {
             alt={photos[currentPhotoIndex].file_name}
           />
           <p>Creation Date/Time: {photos[currentPhotoIndex].date_time}</p>
+          {props.AppState.active_user._id === userId ? (
+            <Button
+              variant='outlined'
+              color='error'
+              size='small'
+              onClick={() => handleDeletePhoto(photos[currentPhotoIndex]._id)}
+            >
+              Delete photo
+            </Button>
+          ) : null}
 
           {/* Comments in advanced view */}
           <Typography variant='h3' sx={{ fontSize: '38px' }}>
@@ -211,6 +248,20 @@ function UserPhotos(props) {
                     </Link>
                   </p>
                   <p>Comment: {comment.comment}</p>
+                  {props.AppState.active_user._id === userId ||
+                  comment.user._id === props.AppState.active_user._id ? (
+                    <Button
+                      variant='outlined'
+                      color='error'
+                      size='small'
+                      onClick={() => handleDeleteComment(
+                          photos[currentPhotoIndex]._id,
+                          comment._id
+                        )}
+                    >
+                      Delete comment
+                    </Button>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -228,12 +279,22 @@ function UserPhotos(props) {
             }`}
           >
             <img src={`/images/${photo.file_name}`} alt={photo.file_name} />
+						<div>
+							<strong>Creation Date/Time: </strong>
+							{photo.date_time}
+						</div>
+            {props.AppState.active_user._id === userId ? (
+              <Button
+                variant='outlined'
+                color='error'
+                size='small'
+                onClick={() => handleDeletePhoto(photo._id)}
+              >
+                Delete photo
+              </Button>
+            ) : null}
             <div>
               <div className="user-photos-creation-favorite">
-                <div>
-                  <strong>Creation Date/Time: </strong>
-                  {photo.date_time}
-                </div>
                 <div>
                   {favoritePhotos.includes(photo._id) ? (
                     <Button variant="contained" size="small" onClick={() => handleDeleteFavorite(photo._id)}>
@@ -270,6 +331,17 @@ function UserPhotos(props) {
                       <strong>Comment: </strong>
                       {comment.comment}
                     </p>
+                    {props.AppState.active_user._id === userId ||
+                    comment.user._id === props.AppState.active_user._id ? (
+                      <Button
+                        variant='outlined'
+                        color='error'
+                        size='small'
+                        onClick={() => handleDeleteComment(photo._id, comment._id)}
+                      >
+                        Delete comment
+                      </Button>
+                    ) : null}
                   </li>
                 ))}
               </ul>
@@ -278,46 +350,48 @@ function UserPhotos(props) {
                 No comments for this photo
               </Typography>
             )}
-			<div>
-				<TextField
-					label="Add a comment"
-					onChange={handleCommentChange}
-					multiline
-					rows={4}
-					variant="outlined"
-					fullWidth
-					id={`commentBox${photo._id}`}
-					key={photo._id}
-				/>
-				<Button
-					variant="contained"
-					color="primary"
-					onClick={()=>{handleCommentSubmit(photo._id);}}
-					disabled={!newComment.trim()}
-				>
-				Submit
-				</Button>
-			</div>
+            <div>
+              <TextField
+                label='Add a comment'
+                onChange={handleCommentChange}
+                multiline
+                rows={4}
+                variant='outlined'
+                fullWidth
+                id={`commentBox${photo._id}`}
+                key={photo._id}
+              />
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={() => {
+                  handleCommentSubmit(photo._id);
+                }}
+                disabled={!newComment.trim()}
+              >
+                Submit
+              </Button>
+            </div>
           </div>
         ))
       )}
-	  { (props.AppState.active_user._id === userId) ?
-	  (
-      <div className='add-photos'>
-        <form action='' onSubmit={handleUploadButtonClicked}>
-          <input
-            type='file'
-            accept='image/*'
-            ref={(domFileRef) => {
-              uploadInput = domFileRef;
-            }}
-          />
-          <input value='Submit Photo' type='submit' id='submit-photo-btn' />
-        </form>
-      </div>
-  	  )
-	  :
-	  <div></div>}
+      {/* If logged in user is same as user profile */}
+      {props.AppState.active_user._id === userId ? (
+        <div className='add-photos'>
+          <form action='' onSubmit={handleUploadButtonClicked}>
+            <input
+              type='file'
+              accept='image/*'
+              ref={(domFileRef) => {
+                uploadInput = domFileRef;
+              }}
+            />
+            <input value='Submit Photo' type='submit' id='submit-photo-btn' />
+          </form>
+        </div>
+      ) : (
+        <div></div>
+      )}
     </div>
   );
 }

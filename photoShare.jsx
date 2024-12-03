@@ -1,11 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-  HashRouter, Route, Switch, Redirect
-} from 'react-router-dom';
-import {
-  Grid, Paper
-} from '@mui/material';
+import { HashRouter, Route, Switch, Redirect } from 'react-router-dom';
+import { Grid, Paper } from '@mui/material';
 import './styles/main.css';
 
 import TopBar from './components/topBar/TopBar';
@@ -47,11 +43,11 @@ class PhotoShare extends React.Component {
           <Grid container spacing={8}>
             <Grid item xs={12}>
               <TopBar AppState={this.state} SetUser={this.setCurrentUser} />
-            </Grid>
+            </Grid> 
             <div className="main-topbar-buffer" />
             <Grid item sm={3}>
               <Paper className="main-grid-item">
-                <UserList key={this.state.reloadSidebar ? Math.random() : 'static'} reloadSidebar={this.state.reloadSidebar} />
+                <UserList key={Math.random()} reloadSidebar={this.state.reloadSidebar} />
               </Paper>
             </Grid>
             <Grid item sm={9}>
@@ -68,7 +64,7 @@ class PhotoShare extends React.Component {
                     this.state.isLoggedIn ?
                       (
                         <Route path="/users/:userId"
-                          render={props => <UserDetail {...props} key={Math.random()}/>} />
+                          render={props => <UserDetail AppState={this.state} SetUser={this.setCurrentUser} {...props} key={Math.random()}/>} />
                       )
                       :
                       <Redirect path="/users/:userId" to="/login-register" />
@@ -88,7 +84,7 @@ class PhotoShare extends React.Component {
                     this.state.isLoggedIn ?
                       <Route path="/favorites" render={props => <Favorites {...props} />} />
                       :
-                      <Redirect path="/users" to="/login-register" />
+                      <Redirect path="/favorites" to="/login-register" />
                   }
 
                   {
